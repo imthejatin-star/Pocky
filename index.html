@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#080a10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Purse — Personal Money Manager</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+ --bg:#080a10;--surface:#10131b;--surface2:#171b25;--surface3:#1d2230;
+ --text:#f5f7fb;--muted:#8c95a8;--line:#262c39;
+ --accent:#786cff;--accent2:#9d95ff;--green:#35d399;--red:#ff6175;
+ --yellow:#f5c451;--blue:#50a8ff;--orange:#ff9b5a;
+ --radius:22px;--shadow:0 15px 45px #0005;
+}
+body.light{
+ --bg:#f4f5f8;--surface:#fff;--surface2:#f0f1f5;--surface3:#e7e9ef;
+ --text:#151821;--muted:#687080;--line:#dfe2e9;--shadow:0 10px 30px #0001;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text)}
+body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}
+button{border:0;color:inherit;cursor:pointer}
+input,select,textarea{outline:none}
+button:active{transform:scale(.97)}
+.app{width:100%;max-width:620px;margin:auto;min-height:100vh;padding-bottom:94px}
+.header{height:72px;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(18px)}
+.logo{font-size:25px;font-weight:900;letter-spacing:-1px}.logo b{color:var(--accent)}
+.header-actions{display:flex;gap:8px}
+.icon-btn{width:42px;height:42px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center}
+.page{display:none;padding:10px 17px 25px}.page.active{display:block;animation:pageIn .2s ease}
+@keyframes pageIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.greeting{font-size:13px;color:var(--muted);margin:4px 2px}
+.page-title{font-size:29px;font-weight:850;letter-spacing:-1.1px;margin:5px 0 18px}
+.balance-card{border-radius:27px;padding:23px;background:linear-gradient(135deg,#292450,#14162a);border:1px solid #3c356d;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.balance-card:before,.balance-card:after{content:"";position:absolute;border-radius:50%;background:#9288ff13;pointer-events:none}
+.balance-card:before{width:230px;height:230px;right:-110px;top:-130px}.balance-card:after{width:150px;height:150px;left:-90px;bottom:-90px}
+.balance-label{font-size:12px;color:#bbb7d4;position:relative;z-index:1}
+.balance{font-size:40px;line-height:1.15;font-weight:900;letter-spacing:-1.5px;margin:7px 0 21px;position:relative;z-index:1}
+.balance-row{display:flex;gap:9px;position:relative;z-index:1}.balance-row button{flex:1}
+.btn{border-radius:14px;padding:13px 15px;font-weight:750}.btn-primary{background:#fff;color:#171721}.btn-soft{background:#ffffff14;border:1px solid #ffffff16}.btn-accent{background:var(--accent);color:white}.btn-danger{background:#ff617518;color:var(--red)}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:13px 0}
+.summary{background:var(--surface);border:1px solid var(--line);border-radius:19px;padding:16px}
+.summary-label{font-size:11px;color:var(--muted);margin-bottom:7px}.summary-value{font-size:19px;font-weight:800}
+.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}.blue{color:var(--blue)}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:21px 2px 10px}.section-head h3{font-size:16px}.section-head small{color:var(--muted)}
+.link{background:none;color:var(--accent2);font-size:12px;font-weight:750}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.quick{background:var(--surface);border:1px solid var(--line);border-radius:19px;padding:16px;text-align:left}
+.quick-icon{font-size:23px;margin-bottom:9px}.quick strong{display:block;font-size:13px}.quick span{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.tx{display:flex;align-items:center;gap:11px;padding:12px 2px}
+.tx-icon{width:44px;height:44px;flex:0 0 44px;border-radius:14px;background:var(--surface2);display:grid;place-items:center;font-size:19px}
+.tx-body{flex:1;min-width:0}.tx-name{font-size:13px;font-weight:720;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{font-size:10px;color:var(--muted);margin-top:3px}.tx-right{text-align:right}.tx-amount{font-size:13px;font-weight:800}.tx-amount.plus{color:var(--green)}.tx-amount.minus{color:var(--red)}.tx-account{font-size:9px;color:var(--muted);margin-top:3px}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:20px;padding:28px 17px;text-align:center;color:var(--muted);font-size:12px}
+.empty-icon{font-size:30px;margin-bottom:9px}.empty strong{display:block;color:var(--text);font-size:14px;margin-bottom:5px}
+.search{width:100%;background:var(--surface);border:1px solid var(--line);color:var(--text);padding:13px 15px;border-radius:15px;margin-bottom:10px}
+.filter-row{display:flex;gap:7px;overflow:auto;padding-bottom:5px;margin-bottom:12px}.filter{white-space:nowrap;background:var(--surface);border:1px solid var(--line);padding:9px 12px;border-radius:12px;font-size:11px}.filter.active{background:#292551;border-color:#5148a1;color:#c7c3ff}
+.group-title{font-size:11px;color:var(--muted);font-weight:750;text-transform:uppercase;letter-spacing:.6px;margin:17px 2px 5px}
+.form-card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:17px;margin-bottom:12px}
+label{display:block;color:var(--muted);font-size:11px;margin:0 0 7px}
+.field{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--text);padding:13px;border-radius:14px;margin-bottom:14px}
+textarea.field{min-height:82px;resize:none}.amount-field{font-size:31px;text-align:center;font-weight:850;padding:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form-grid .field{margin-bottom:14px}
+.type-toggle{display:grid;grid-template-columns:1fr 1fr;background:var(--surface2);border-radius:14px;padding:4px;margin-bottom:15px}.type-toggle button{padding:11px;border-radius:11px;background:none;color:var(--muted);font-weight:750}.type-toggle button.active.in{background:#35d39918;color:var(--green)}.type-toggle button.active.out{background:#ff617518;color:var(--red)}
+.category-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:15px}.cat-choice{padding:11px 5px;border-radius:13px;background:var(--surface2);border:1px solid transparent;font-size:10px;color:var(--muted)}.cat-choice div{font-size:18px;margin-bottom:4px}.cat-choice.selected{border-color:var(--accent);background:#786cFF15;color:var(--text)}
+.split-row{display:flex;gap:8px}.split-row>*{flex:1}
+.account-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:17px;margin-bottom:10px;position:relative}
+.account-top{display:flex;align-items:center;gap:11px}.account-icon{width:43px;height:43px;border-radius:14px;background:var(--surface2);display:grid;place-items:center;font-size:20px}.account-main{flex:1}.account-name{font-weight:750;font-size:14px}.account-type{font-size:10px;color:var(--muted);margin-top:2px}.account-bal{font-size:19px;font-weight:850;margin-top:13px}.account-actions{display:flex;gap:7px;margin-top:12px}.mini-btn{flex:1;padding:9px;border-radius:11px;background:var(--surface2);font-size:10px;font-weight:700}
+.goal-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:17px;margin-bottom:11px}
+.goal-head{display:flex;align-items:center;gap:11px}.goal-icon{width:43px;height:43px;border-radius:14px;background:#786cFF18;display:grid;place-items:center;font-size:20px}.goal-info{flex:1}.goal-name{font-size:14px;font-weight:780}.goal-target{font-size:10px;color:var(--muted);margin-top:3px}.goal-menu{background:none;font-size:18px;color:var(--muted)}
+.progress{height:9px;background:var(--surface3);border-radius:20px;overflow:hidden;margin-top:14px}.progress i{height:100%;display:block;border-radius:20px;background:linear-gradient(90deg,var(--accent),#a59fff)}.goal-foot{display:flex;justify-content:space-between;margin-top:8px;color:var(--muted);font-size:10px}.goal-foot b{color:var(--accent2)}
+.budget-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:17px;margin-bottom:11px}.budget-head{display:flex;justify-content:space-between;align-items:center}.budget-name{font-weight:750;font-size:13px}.budget-values{font-size:11px;color:var(--muted)}.budget-values b{color:var(--text)}.budget-status{display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:var(--muted)}
+.chart-card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:17px;margin-bottom:12px}.chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.chart-head strong{font-size:15px}.chart-head span{font-size:11px;color:var(--muted)}
+.chart{height:170px;display:flex;align-items:flex-end;gap:7px}.chart-col{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}.chart-bar{width:min(30px,75%);border-radius:8px 8px 3px 3px;background:var(--accent);min-height:2px}.chart-label{font-size:8px;color:var(--muted);margin-top:6px}
+.stat-big{font-size:28px;font-weight:850}.stat-sub{font-size:11px;color:var(--muted);margin-top:3px}.stat-three{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat-mini{background:var(--surface2);border-radius:15px;padding:13px}.stat-mini strong{font-size:15px;display:block}.stat-mini span{font-size:9px;color:var(--muted)}
+.category-stat{display:flex;align-items:center;gap:10px;padding:9px 0}.category-dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}.category-name{flex:1;font-size:12px}.category-val{font-size:11px;font-weight:750}.category-pct{font-size:9px;color:var(--muted);width:35px;text-align:right}
+.setting{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:9px}.setting-line{display:flex;align-items:center;gap:12px}.setting-icon{width:38px;height:38px;border-radius:12px;background:var(--surface2);display:grid;place-items:center}.setting-content{flex:1}.setting-title{font-size:13px;font-weight:720}.setting-desc{font-size:10px;color:var(--muted);margin-top:3px}.setting-arrow{color:var(--muted)}
+.toggle{width:48px;height:27px;border-radius:20px;background:var(--surface3);padding:3px}.toggle i{display:block;width:21px;height:21px;border-radius:50%;background:#7c8493;transition:.2s}.toggle.on{background:var(--accent)}.toggle.on i{background:#fff;transform:translateX(21px)}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(620px,100%);display:grid;grid-template-columns:repeat(5,1fr);padding:9px 10px calc(9px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(20px);border-top:1px solid var(--line);z-index:30}
+.nav-btn{background:none;color:#70798c;border-radius:13px;padding:5px 2px;font-size:9px}.nav-btn div{font-size:19px;line-height:22px;margin-bottom:2px}.nav-btn.active{color:var(--accent2);background:#786cFF12}
+.fab{position:fixed;right:max(18px,calc((100vw - 620px)/2 + 18px));bottom:78px;width:55px;height:55px;border-radius:18px;background:var(--accent);color:#fff;font-size:25px;box-shadow:0 12px 35px #0007;z-index:25}
+.modal-bg{position:fixed;inset:0;background:#000a;backdrop-filter:blur(8px);z-index:80;display:none;align-items:flex-end;justify-content:center;padding:12px}.modal-bg.show{display:flex}.modal{width:min(620px,100%);max-height:92vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:27px;padding:19px;animation:modalIn .22s ease}@keyframes modalIn{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:17px}.modal-head h2{font-size:20px}.close{width:35px;height:35px;border-radius:11px;background:var(--surface2)}
+.modal-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}.modal-buttons .full{grid-column:1/-1}
+.full{width:100%;padding:14px;border-radius:14px;background:var(--accent);color:#fff;font-weight:800}.outline{width:100%;padding:13px;border-radius:14px;background:var(--surface2);font-weight:700}
+.confirm-icon{text-align:center;font-size:40px;margin:5px 0 10px}.confirm-text{text-align:center;color:var(--muted);font-size:12px;line-height:1.5;margin-bottom:18px}.confirm-text strong{color:var(--text)}
+.toast{position:fixed;top:17px;left:50%;transform:translate(-50%,-100px);background:var(--text);color:var(--bg);padding:11px 16px;border-radius:14px;font-size:12px;font-weight:750;z-index:200;transition:.25s;box-shadow:var(--shadow);white-space:nowrap}.toast.show{transform:translate(-50%,0)}
+.pin-screen{position:fixed;inset:0;background:var(--bg);z-index:300;display:none;align-items:center;justify-content:center;padding:25px}.pin-screen.show{display:flex}.pin-box{width:min(360px,100%);text-align:center}.pin-logo{font-size:34px;font-weight:900;margin-bottom:7px}.pin-logo b{color:var(--accent)}.pin-message{font-size:13px;color:var(--muted)}.pin-dots{display:flex;justify-content:center;gap:11px;margin:24px}.pin-dot{width:12px;height:12px;border-radius:50%;background:var(--surface3)}.pin-dot.on{background:var(--accent)}.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.pin-key{height:57px;border-radius:17px;background:var(--surface);border:1px solid var(--line);font-size:19px}
+.no-scrollbar{scrollbar-width:none}.no-scrollbar::-webkit-scrollbar{display:none}
+.badge{display:inline-block;padding:4px 7px;border-radius:7px;font-size:9px;background:var(--surface2);color:var(--muted)}
+@media(min-width:700px){body{background:#05060a}.app{background:var(--bg);box-shadow:0 0 100px #0006}}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header class="header">
+  <div class="logo">P<b>urse</b></div>
+  <div class="header-actions">
+    <button class="icon-btn" onclick="openNotifications()">🔔</button>
+    <button class="icon-btn" onclick="navigate('settings')">⚙️</button>
+  </div>
+</header>
+
+<main>
+
+<!-- HOME -->
+<section id="home" class="page active">
+  <div class="greeting" id="greeting">Good morning</div>
+  <div class="page-title">Your money</div>
+
+  <div class="balance-card">
+    <div class="balance-label">Total available balance</div>
+    <div class="balance" id="homeBalance">₹0.00</div>
+    <div class="balance-row">
+      <button class="btn btn-primary" onclick="openMoneyModal('income')">＋ Add money</button>
+      <button class="btn btn-soft" onclick="openMoneyModal('expense')">− Spend</button>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary">
+      <div class="summary-label">Income this month</div>
+      <div class="summary-value green" id="homeIncome">₹0</div>
+    </div>
+    <div class="summary">
+      <div class="summary-label">Spent this month</div>
+      <div class="summary-value red" id="homeExpense">₹0</div>
+    </div>
+    <div class="summary">
+      <div class="summary-label">Savings this month</div>
+      <div class="summary-value blue" id="homeSavings">₹0</div>
+    </div>
+    <div class="summary">
+      <div class="summary-label">Savings rate</div>
+      <div class="summary-value yellow" id="homeRate">0%</div>
+    </div>
+  </div>
+
+  <div class="section-head"><h3>Quick actions</h3></div>
+  <div class="quick-grid">
+    <button class="quick" onclick="openMoneyModal('income')"><div class="quick-icon">💰</div><strong>Add savings</strong><span>Record money received</span></button>
+    <button class="quick" onclick="openMoneyModal('expense')"><div class="quick-icon">🧾</div><strong>Record spending</strong><span>Track where money goes</span></button>
+    <button class="quick" onclick="openGoalModal()"><div class="quick-icon">🎯</div><strong>Savings goal</strong><span>Build toward a target</span></button>
+    <button class="quick" onclick="navigate('budgets')"><div class="quick-icon">🛡️</div><strong>Set budget</strong><span>Control your spending</span></button>
+    <button class="quick" onclick="navigate('accounts')"><div class="quick-icon">👛</div><strong>Money accounts</strong><span>Manage separate balances</span></button>
+    <button class="quick" onclick="navigate('stats')"><div class="quick-icon">📊</div><strong>Money insights</strong><span>See your habits</span></button>
+  </div>
+
+  <div class="section-head"><h3>Upcoming</h3><button class="link" onclick="navigate('recurring')">Manage</button></div>
+  <div id="homeUpcoming"></div>
+
+  <div class="section-head"><h3>Recent activity</h3><button class="link" onclick="navigate('transactions')">See all</button></div>
+  <div id="homeTransactions"></div>
+</section>
+
+<!-- TRANSACTIONS -->
+<section id="transactions" class="page">
+  <div class="page-title">Activity</div>
+  <input id="transactionSearch" class="search" placeholder="🔎 Search transactions..." oninput="renderTransactions()">
+  <div class="filter-row no-scrollbar">
+    <button class="filter active" data-filter="all" onclick="setTransactionFilter('all')">All</button>
+    <button class="filter" data-filter="income" onclick="setTransactionFilter('income')">Income</button>
+    <button class="filter" data-filter="expense" onclick="setTransactionFilter('expense')">Expenses</button>
+    <button class="filter" data-filter="today" onclick="setTransactionFilter('today')">Today</button>
+    <button class="filter" data-filter="month" onclick="setTransactionFilter('month')">This month</button>
+  </div>
+  <div id="transactionList"></div>
+</section>
+
+<!-- ACCOUNTS -->
+<section id="accounts" class="page">
+  <div class="page-title">Money accounts</div>
+  <button class="full" onclick="openAccountModal()">＋ Add account</button>
+  <div class="section-head"><h3>All accounts</h3><small id="accountTotal"></small></div>
+  <div id="accountList"></div>
+</section>
+
+<!-- GOALS -->
+<section id="goals" class="page">
+  <div class="page-title">Savings goals</div>
+  <button class="full" onclick="openGoalModal()">＋ Create savings goal</button>
+  <div class="section-head"><h3>Your goals</h3></div>
+  <div id="goalList"></div>
+</section>
+
+<!-- BUDGETS -->
+<section id="budgets" class="page">
+  <div class="page-title">Budgets</div>
+  <button class="full" onclick="openBudgetModal()">＋ Create budget</button>
+  <div class="section-head"><h3>Monthly limits</h3><small id="budgetMonth"></small></div>
+  <div id="budgetList"></div>
+</section>
+
+<!-- RECURRING -->
+<section id="recurring" class="page">
+  <div class="page-title">Recurring money</div>
+  <div class="form-card" style="margin-bottom:14px">
+    <div style="font-size:12px;color:var(--muted);line-height:1.5">Track subscriptions, regular bills, expected savings, allowances from any source, or other repeating money movements.</div>
+  </div>
+  <button class="full" onclick="openRecurringModal()">＋ Add recurring item</button>
+  <div class="section-head"><h3>Scheduled items</h3></div>
+  <div id="recurringList"></div>
+</section>
+
+<!-- STATS -->
+<section id="stats" class="page">
+  <div class="page-title">Insights</div>
+  <div class="chart-card">
+    <div class="chart-head"><strong>Last 7 days</strong><span>Spending</span></div>
+    <div id="weeklyChart" class="chart"></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-head"><strong>This month</strong><span id="statsMonth"></span></div>
+    <div class="stat-three">
+      <div class="stat-mini"><strong class="green" id="statsIncome">₹0</strong><span>Income</span></div>
+      <div class="stat-mini"><strong class="red" id="statsExpense">₹0</strong><span>Spent</span></div>
+      <div class="stat-mini"><strong class="blue" id="statsSaved">₹0</strong><span>Net saved</span></div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-head"><strong>Spending by category</strong><span id="statsTotal"></span></div>
+    <div id="categoryStats"></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-head"><strong>Money habits</strong></div>
+    <div class="stat-three">
+      <div class="stat-mini"><strong id="habitAvg">₹0</strong><span>Avg daily spend</span></div>
+      <div class="stat-mini"><strong id="habitLargest">₹0</strong><span>Largest expense</span></div>
+      <div class="stat-mini"><strong id="habitCount">0</strong><span>Transactions</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section id="settings" class="page">
+  <div class="page-title">Settings</div>
+
+  <div class="setting" onclick="toggleTheme()">
+    <div class="setting-line">
+      <div class="setting-icon">🌙</div>
+      <div class="setting-content"><div class="setting-title">Appearance</div><div class="setting-desc" id="themeText">Dark mode</div></div>
+      <div class="setting-arrow">›</div>
+    </div>
+  </div>
+
+  <div class="setting">
+    <div class="setting-line">
+      <div class="setting-icon">🔐</div>
+      <div class="setting-content"><div class="setting-title">App lock</div><div class="setting-desc">Protect Purse with a 4-digit PIN</div></div>
+      <button class="toggle" id="pinToggle" onclick="togglePin(event)"><i></i></button>
+    </div>
+  </div>
+
+  <div class="setting" onclick="openPinSetup()">
+    <div class="setting-line">
+      <div class="setting-icon">🔢</div>
+      <div class="setting-content"><div class="setting-title">Change PIN</div><div class="setting-desc">Create or replace your 4-digit PIN</div></div>
+      <div class="setting-arrow">›</div>
+    </div>
+  </div>
+
+  <div class="setting" onclick="exportData()">
+    <div class="setting-line">
+      <div class="setting-icon">📤</div>
+      <div class="setting-content"><div class="setting-title">Export backup</div><div class="setting-desc">Save a complete copy of your Purse data</div></div>
+      <div class="setting-arrow">›</div>
+    </div>
+  </div>
+
+  <div class="setting" onclick="importData()">
+    <div class="setting-line">
+      <div class="setting-icon">📥</div>
+      <div class="setting-content"><div class="setting-title">Restore backup</div><div class="setting-desc">Import a previous Purse backup</div></div>
+      <div class="setting-arrow">›</div>
+    </div>
+  </div>
+
+  <div class="setting" onclick="openCurrencyModal()">
+    <div class="setting-line">
+      <div class="setting-icon">₹</div>
+      <div class="setting-content"><div class="setting-title">Currency</div><div class="setting-desc" id="currencyText">Indian Rupee (₹)</div></div>
+      <div class="setting-arrow">›</div>
+    </div>
+  </div>
+
+  <div class="setting" onclick="openDataInfo()">
+    <div class="setting-line">
+      <div class="setting-icon">💾</div>
+      <div class="setting-content"><div class="setting-title">Your data</div><div class="setting-desc">Stored locally on this device</div></div>
+      <div class="setting-arrow">›</div>
+    </div>
+  </div>
+
+  <div class="setting" onclick="openConfirm('deleteAll')">
+    <div class="setting-line">
+      <div class="setting-icon">🗑️</div>
+      <div class="setting-content"><div class="setting-title danger">Delete all data</div><div class="setting-desc">Erase transactions, accounts, goals and budgets</div></div>
+      <div class="setting-arrow">›</div>
+    </div>
+  </div>
+
+  <div class="note" style="text-align:center;color:var(--muted);font-size:10px;line-height:1.6;margin:18px">
+    Purse is a personal money-management application.<br>
+    It records your own financial information locally and does not itself provide banking, UPI, payment, lending or deposit services.
+  </div>
+</section>
+
+</main>
+
+<button class="fab" onclick="openMoneyModal('expense')">＋</button>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-page="home" onclick="navigate('home')"><div>⌂</div>Home</button>
+  <button class="nav-btn" data-page="transactions" onclick="navigate('transactions')"><div>≡</div>Activity</button>
+  <button class="nav-btn" data-page="goals" onclick="navigate('goals')"><div>🎯</div>Goals</button>
+  <button class="nav-btn" data-page="stats" onclick="navigate('stats')"><div>▥</div>Insights</button>
+  <button class="nav-btn" data-page="settings" onclick="navigate('settings')"><div>⚙</div>Settings</button>
+</nav>
+</div>
+
+<!-- MONEY MODAL -->
+<div class="modal-bg" id="moneyModal">
+<div class="modal">
+  <div class="modal-head"><h2 id="moneyTitle">Record spending</h2><button class="close" onclick="closeModal('moneyModal')">✕</button></div>
+
+  <div class="type-toggle">
+    <button id="incomeTypeBtn" onclick="setMoneyType('income')">＋ Money in</button>
+    <button id="expenseTypeBtn" class="active out" onclick="setMoneyType('expense')">− Money out</button>
+  </div>
+
+  <label>Amount</label>
+  <input id="moneyAmount" class="field amount-field" type="number" min="0.01" step="0.01" placeholder="₹ 0.00">
+
+  <label>Description</label>
+  <input id="moneyDescription" class="field" placeholder="What was this for?">
+
+  <label>Category</label>
+  <div id="categoryChoices" class="category-grid"></div>
+
+  <div class="form-grid">
+    <div>
+      <label>Account</label>
+      <select id="moneyAccount" class="field"></select>
+    </div>
+    <div>
+      <label>Date</label>
+      <input id="moneyDate" class="field" type="date">
+    </div>
+  </div>
+
+  <label>Notes (optional)</label>
+  <textarea id="moneyNotes" class="field" placeholder="Add any useful details..."></textarea>
+
+  <button class="full" onclick="saveMoneyTransaction()">Save transaction</button>
+  <button class="outline" style="margin-top:7px" onclick="closeModal('moneyModal')">Cancel</button>
+</div>
+</div>
+
+<!-- GOAL MODAL -->
+<div class="modal-bg" id="goalModal">
+<div class="modal">
+  <div class="modal-head"><h2>Create savings goal</h2><button class="close" onclick="closeModal('goalModal')">✕</button></div>
+  <label>Goal name</label>
+  <input id="goalName" class="field" placeholder="e.g. New tablet">
+  <div class="form-grid">
+    <div><label>Target amount</label><input id="goalTarget" class="field" type="number" min="1" placeholder="₹ 10,000"></div>
+    <div><label>Already saved</label><input id="goalSaved" class="field" type="number" min="0" placeholder="₹ 0"></div>
+  </div>
+  <label>Target date (optional)</label>
+  <input id="goalDate" class="field" type="date">
+  <label>Goal icon</label>
+  <select id="goalIcon" class="field">
+    <option value="🎯">🎯 Target</option><option value="💻">💻 Technology</option><option value="🎮">🎮 Gaming</option>
+    <option value="📚">📚 Education</option><option value="✈️">✈️ Travel</option><option value="🎁">🎁 Purchase</option>
+    <option value="💰">💰 Savings</option><option value="🚲">🚲 Vehicle</option>
+  </select>
+  <button class="full" onclick="saveGoal()">Create goal</button>
+  <button class="outline" style="margin-top:7px" onclick="closeModal('goalModal')">Cancel</button>
+</div>
+</div>
+
+<!-- ACCOUNT MODAL -->
+<div class="modal-bg" id="accountModal">
+<div class="modal">
+  <div class="modal-head"><h2>Add money account</h2><button class="close" onclick="closeModal('accountModal')">✕</button></div>
+  <label>Account name</label><input id="accountName" class="field" placeholder="e.g. Main savings">
+  <label>Account type</label>
+  <select id="accountType" class="field">
+    <option>Cash</option><option>Savings</option><option>Bank</option><option>Wallet</option><option>Other</option>
+  </select>
+  <label>Starting balance</label><input id="accountBalance" class="field" type="number" min="0" step=".01" placeholder="₹ 0">
+  <label>Icon</label>
+  <select id="accountIcon" class="field">
+    <option>💰</option><option>🏦</option><option>👛</option><option>💳</option><option>💵</option><option>🪙</option>
+  </select>
+  <button class="full" onclick="saveAccount()">Add account</button>
+  <button class="outline" style="margin-top:7px" onclick="closeModal('accountModal')">Cancel</button>
+</div>
+</div>
+
+<!-- BUDGET MODAL -->
+<div class="modal-bg" id="budgetModal">
+<div class="modal">
+  <div class="modal-head"><h2>Create monthly budget</h2><button class="close" onclick="closeModal('budgetModal')">✕</button></div>
+  <label>Category</label>
+  <select id="budgetCategory" class="field"></select>
+  <label>Monthly limit</label>
+  <input id="budgetAmount" class="field amount-field" type="number" min="1" placeholder="₹ 2,000">
+  <button class="full" onclick="saveBudget()">Create budget</button>
+  <button class="outline" style="margin-top:7px" onclick="closeModal('budgetModal')">Cancel</button>
+</div>
+</div>
+
+<!-- RECURRING MODAL -->
+<div class="modal-bg" id="recurringModal">
+<div class="modal">
+  <div class="modal-head"><h2>Recurring item</h2><button class="close" onclick="closeModal('recurringModal')">✕</button></div>
+  <div class="type-toggle">
+    <button id="recIn" onclick="setRecurringType('income')">＋ Expected in</button>
+    <button id="recOut" class="active out" onclick="setRecurringType('expense')">− Expected out</button>
+  </div>
+  <label>Name</label><input id="recName" class="field" placeholder="e.g. Monthly subscription">
+  <label>Amount</label><input id="recAmount" class="field amount-field" type="number" min=".01" placeholder="₹ 0">
+  <div class="form-grid">
+    <div><label>Frequency</label><select id="recFrequency" class="field"><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></div>
+    <div><label>Next date</label><input id="recDate" class="field" type="date"></div>
+  </div>
+  <label>Category</label><select id="recCategory" class="field"></select>
+  <button class="full" onclick="saveRecurring()">Save recurring item</button>
+  <button class="outline" style="margin-top:7px" onclick="closeModal('recurringModal')">Cancel</button>
+</div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-bg" id="confirmModal">
+<div class="modal">
+  <div class="confirm-icon" id="confirmIcon">⚠️</div>
+  <div class="modal-head" style="justify-content:center"><h2 id="confirmTitle">Are you sure?</h2></div>
+  <div class="confirm-text" id="confirmText"></div>
+  <div class="modal-buttons">
+    <button class="full" id="confirmAction">Continue</button>
+    <button class="outline" onclick="closeModal('confirmModal')">Cancel</button>
+  </div>
+</div>
+</div>
+
+<!-- SIMPLE MODAL -->
+<div class="modal-bg" id="simpleModal">
+<div class="modal">
+  <div class="modal-head"><h2 id="simpleTitle"></h2><button class="close" onclick="closeModal('simpleModal')">✕</button></div>
+  <div id="simpleContent"></div>
+</div>
+</div>
+
+<input type="file" id="importFile" accept=".json,application/json" style="display:none">
+<div class="toast" id="toast"></div>
+
+<!-- PIN -->
+<div class="pin-screen" id="pinScreen">
+<div class="pin-box">
+  <div class="pin-logo">P<b>urse</b></div>
+  <div class="pin-message" id="pinMessage">Enter your PIN</div>
+  <div class="pin-dots" id="pinDots"></div>
+  <div class="pin-pad">
+    <button class="pin-key" onclick="pinInput('1')">1</button><button class="pin-key" onclick="pinInput('2')">2</button><button class="pin-key" onclick="pinInput('3')">3</button>
+    <button class="pin-key" onclick="pinInput('4')">4</button><button class="pin-key" onclick="pinInput('5')">5</button><button class="pin-key" onclick="pinInput('6')">6</button>
+    <button class="pin-key" onclick="pinInput('7')">7</button><button class="pin-key" onclick="pinInput('8')">8</button><button class="pin-key" onclick="pinInput('9')">9</button>
+    <button class="pin-key" onclick="pinInput('clear')">⌫</button><button class="pin-key" onclick="pinInput('0')">0</button><button class="pin-key" onclick="pinInput('cancel')">×</button>
+  </div>
+</div>
+</div>
+
+<script>
+const STORAGE_KEY="purse_complete_local_data_v1";
+
+const expenseCategories={
+ Food:["🍔","Food"],Transport:["🚌","Transport"],School:["📚","School"],Shopping:["🛍️","Shopping"],
+ Games:["🎮","Games"],Entertainment:["🎬","Entertainment"],Bills:["🧾","Bills"],Health:["❤️","Health"],
+Technology:["💻","Technology"],Travel:["✈️","Travel"],Gifts:["🎁","Gifts"],Other:["📦","Other"]
+};
+
+const incomeCategories={
+ Savings:["💰","Savings"],Gift:["🎁","Gift"],Refund:["↩️","Refund"],Work:["💼","Work"],
+Sale:["💵","Sale"],Other:["💰","Other"]
+};
+
+const defaultData={
+ transactions:[],
+ accounts:[
+   {id:"default",name:"Main savings",type:"Savings",balance:0,icon:"💰",created:Date.now()}
+ ],
+ goals:[],
+ budgets:[],
+ recurring:[],
+ settings:{
+   pinEnabled:false,
+   pin:"",
+   theme:"dark",
+   currency:"INR",
+   currencySymbol:"₹"
+ }
+};
+
+let data=loadData();
+let currentMoneyType="expense";
+let currentRecurringType="expense";
+let selectedCategory="Other";
+let transactionFilter="all";
+let pinBuffer="";
+let pinMode="";
+let pinUnlocked=false;
+let confirmAction=null;
+
+function loadData(){
+ try{
+   const raw=localStorage.getItem(STORAGE_KEY);
+   if(!raw)return structuredClone(defaultData);
+   const d=JSON.parse(raw);
+   return {
+     ...structuredClone(defaultData),
+     ...d,
+     settings:{...defaultData.settings,...(d.settings||{})},
+     accounts:Array.isArray(d.accounts)&&d.accounts.length?d.accounts:structuredClone(defaultData.accounts),
+     transactions:Array.isArray(d.transactions)?d.transactions:[],
+     goals:Array.isArray(d.goals)?d.goals:[],
+     budgets:Array.isArray(d.budgets)?d.budgets:[],
+     recurring:Array.isArray(d.recurring)?d.recurring:[]
+   };
+ }catch(e){return structuredClone(defaultData)}
+}
+
+function persist(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data))}
+
+function uid(prefix="id"){
+ return prefix+"_"+Date.now()+"_"+Math.random().toString(36).slice(2,9)
+}
+
+function symbol(){return data.settings.currencySymbol||"₹"}
+
+function money(n){
+ return symbol()+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})
+}
+
+function shortMoney(n){
+ const x=Math.abs(Number(n||0));
+ if(x>=10000000)return symbol()+(x/10000000).toFixed(1)+"Cr";
+ if(x>=100000)return symbol()+(x/100000).toFixed(1)+"L";
+ if(x>=1000)return symbol()+(x/1000).toFixed(1)+"K";
+ return money(n);
+}
+
+function today(){
+ return new Date().toISOString().slice(0,10)
+}
+
+function currentMonth(){
+ return today().slice(0,7)
+}
+
+function formatDate(date){
+ const d=new Date(date+"T12:00:00");
+ const now=new Date();
+ const yesterday=new Date();
+ yesterday.setDate(yesterday.getDate()-1);
+ if(date===today())return "Today";
+ if(date===yesterday.toISOString().slice(0,10))return "Yesterday";
+ return d.toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"});
+}
+
+function escapeHTML(s){
+ return String(s??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+ }[c]));
+}
+
+function navigate(page){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ const target=document.getElementById(page);
+ if(!target)return;
+ target.classList.add("active");
+
+ document.querySelectorAll(".nav-btn").forEach(x=>{
+   x.classList.toggle("active",x.dataset.page===page)
+ });
+
+ if(page==="home")renderHome();
+ if(page==="transactions")renderTransactions();
+ if(page==="accounts")renderAccounts();
+ if(page==="goals")renderGoals();
+ if(page==="budgets")renderBudgets();
+ if(page==="recurring")renderRecurring();
+ if(page==="stats")renderStats();
+ if(page==="settings")renderSettings();
+
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function totalBalance(){
+ return data.transactions.reduce((sum,t)=>{
+   return sum+(t.type==="income"?Number(t.amount):-Number(t.amount));
+ },0);
+}
+
+function accountBalance(id){
+ const acc=data.accounts.find(a=>a.id===id);
+ if(!acc)return 0;
+ let result=Number(acc.balance||0);
+ data.transactions.forEach(t=>{
+   if(t.accountId===id)result+=t.type==="income"?Number(t.amount):-Number(t.amount);
+ });
+ return result;
+}
+
+function monthTotals(month=currentMonth()){
+ return data.transactions
+ .filter(t=>t.date.startsWith(month))
+ .reduce((r,t)=>{
+   r[t.type]+=Number(t.amount);
+   return r;
+ },{income:0,expense:0});
+}
+
+function renderHome(){
+ const now=new Date();
+ const hour=now.getHours();
+ document.getElementById("greeting").textContent=hour<12?"Good morning":hour<18?"Good afternoon":"Good evening";
+
+ const balance=totalBalance();
+ const totals=monthTotals();
+ const savings=totals.income-totals.expense;
+ const rate=totals.income?Math.max(0,savings/totals.income*100):0;
+
+ document.getElementById("homeBalance").textContent=money(balance);
+ document.getElementById("homeIncome").textContent=money(totals.income);
+ document.getElementById("homeExpense").textContent=money(totals.expense);
+ document.getElementById("homeSavings").textContent=money(savings);
+ document.getElementById("homeRate").textContent=rate.toFixed(0)+"%";
+
+ const upcoming=data.recurring
+ .filter(r=>r.active)
+ .sort((a,b)=>a.nextDate.localeCompare(b.nextDate))
+ .slice(0,3);
+
+ document.getElementById("homeUpcoming").innerHTML=upcoming.length
+ ?upcoming.map(r=>`
+   <div class="tx">
+     <div class="tx-icon">${r.type==="income"?"↗":"↘"}</div>
+     <div class="tx-body">
+       <div class="tx-name">${escapeHTML(r.name)}</div>
+       <div class="tx-meta">${r.frequency} · ${formatDate(r.nextDate)}</div>
+     </div>
+     <div class="tx-amount ${r.type==="income"?"plus":"minus"}">${r.type==="income"?"+":"−"}${money(r.amount).slice(1)}</div>
+   </div>`).join("")
+ :`<div class="empty"><div class="empty-icon">📅</div><strong>No recurring items</strong>Add bills or repeating money movements to keep track of what's coming.</div>`;
+
+ const recent=[...data.transactions]
+ .sort((a,b)=>new Date(b.date)-new Date(a.date)||b.created-a.created)
+ .slice(0,5);
+
+ document.getElementById("homeTransactions").innerHTML=recent.length
+ ?recent.map(transactionHTML).join("")
+ :`<div class="empty"><div class="empty-icon">💸</div><strong>Your purse is empty</strong>Start by recording money you already have or receive.</div>`;
+}
+
+function transactionHTML(t){
+ const cat=(t.type==="income"?incomeCategories:expenseCategories)[t.category]||["💰",t.category];
+ const account=data.accounts.find(a=>a.id===t.accountId);
+ return `
+ <div class="tx" onclick="openTransactionDetails('${t.id}')">
+   <div class="tx-icon">${cat[0]}</div>
+   <div class="tx-body">
+     <div class="tx-name">${escapeHTML(t.description||t.category)}</div>
+     <div class="tx-meta">${escapeHTML(t.category)} · ${formatDate(t.date)}</div>
+   </div>
+   <div class="tx-right">
+     <div class="tx-amount ${t.type==="income"?"plus":"minus"}">${t.type==="income"?"+":"−"}${money(t.amount).slice(1)}</div>
+     <div class="tx-account">${escapeHTML(account?.name||"Account")}</div>
+   </div>
+ </div>`;
+}
+
+function openMoneyModal(type){
+ currentMoneyType=type;
+ selectedCategory=type==="income"?"Savings":"Other";
+
+ document.getElementById("moneyTitle").textContent=type==="income"?"Add money":"Record spending";
+ document.getElementById("moneyAmount").value="";
+ document.getElementById("moneyDescription").value="";
+ document.getElementById("moneyNotes").value="";
+ document.getElementById("moneyDate").value=today();
+
+ populateAccounts();
+ renderCategoryChoices();
+ updateMoneyToggle();
+
+ document.getElementById("moneyModal").classList.add("show");
+ setTimeout(()=>document.getElementById("moneyAmount").focus(),120);
+}
+
+function populateAccounts(){
+ const select=document.getElementById("moneyAccount");
+ select.innerHTML=data.accounts.map(a=>`<option value="${a.id}">${a.icon} ${escapeHTML(a.name)}</option>`).join("");
+}
+
+function renderCategoryChoices(){
+ const cats=currentMoneyType==="income"?incomeCategories:expenseCategories;
+ document.getElementById("categoryChoices").innerHTML=Object.entries(cats).map(([name,val])=>`
+   <button class="cat-choice ${selectedCategory===name?"selected":""}" onclick="selectCategory('${name}')">
+     <div>${val[0]}</div>${escapeHTML(name)}
+   </button>`).join("");
+}
+
+function selectCategory(cat){
+ selectedCategory=cat;
+ renderCategoryChoices();
+}
+
+function setMoneyType(type){
+ currentMoneyType=type;
+ selectedCategory=type==="income"?"Savings":"Other";
+ document.getElementById("moneyTitle").textContent=type==="income"?"Add money":"Record spending";
+ updateMoneyToggle();
+ renderCategoryChoices();
+}
+
+function updateMoneyToggle(){
+ document.getElementById("incomeTypeBtn").className=currentMoneyType==="income"?"active in":"";
+ document.getElementById("expenseTypeBtn").className=currentMoneyType==="expense"?"active out":"";
+}
+
+function saveMoneyTransaction(){
+ const amount=Number(document.getElementById("moneyAmount").value);
+ const description=document.getElementById("moneyDescription").value.trim();
+ const accountId=document.getElementById("moneyAccount").value;
+ const date=document.getElementById("moneyDate").value||today();
+ const notes=document.getElementById("moneyNotes").value.trim();
+
+ if(!amount||amount<=0){toast("Enter a valid amount");return}
+ if(!accountId){toast("Choose an account");return}
+
+ const tx={
+   id:uid("tx"),
+   type:currentMoneyType,
+   amount,
+   description:description||selectedCategory,
+   category:selectedCategory,
+   accountId,
+   date,
+   notes,
+   created:Date.now()
+ };
+
+ data.transactions.push(tx);
+ persist();
+ closeModal("moneyModal");
+ renderAll();
+ toast(currentMoneyType==="income"?"Money added":"Expense recorded");
+}
+
+function renderTransactions(){
+ const q=(document.getElementById("transactionSearch")?.value||"").toLowerCase();
+
+ let arr=[...data.transactions].sort((a,b)=>{
+   return new Date(b.date)-new Date(a.date)||b.created-a.created;
+ });
+
+ if(transactionFilter==="income")arr=arr.filter(t=>t.type==="income");
+ if(transactionFilter==="expense")arr=arr.filter(t=>t.type==="expense");
+ if(transactionFilter==="today")arr=arr.filter(t=>t.date===today());
+ if(transactionFilter==="month")arr=arr.filter(t=>t.date.startsWith(currentMonth()));
+
+ if(q){
+   arr=arr.filter(t=>
+    `${t.description} ${t.category} ${t.notes}`.toLowerCase().includes(q)
+   );
+ }
+
+ const el=document.getElementById("transactionList");
+
+ if(!arr.length){
+   el.innerHTML=`<div class="empty"><div class="empty-icon">🔎</div><strong>No transactions found</strong>Try a different filter or search.</div>`;
+   return;
+ }
+
+ const groups={};
+ arr.forEach(t=>{
+   if(!groups[t.date])groups[t.date]=[];
+   groups[t.date].push(t);
+ });
+
+ el.innerHTML=Object.entries(groups).map(([date,items])=>`
+   <div class="group-title">${formatDate(date)}</div>
+   ${items.map(transactionHTML).join("")}
+ `).join("");
+}
+
+function setTransactionFilter(filter){
+ transactionFilter=filter;
+ document.querySelectorAll(".filter").forEach(x=>x.classList.toggle("active",x.dataset.filter===filter));
+ renderTransactions();
+}
+
+function openTransactionDetails(id){
+ const t=data.transactions.find(x=>x.id===id);
+ if(!t)return;
+
+ const account=data.accounts.find(a=>a.id===t.accountId);
+ const cat=(t.type==="income"?incomeCategories:expenseCategories)[t.category]||["💰",t.category];
+
+ document.getElementById("simpleTitle").textContent="Transaction";
+ document.getElementById("simpleContent").innerHTML=`
+   <div class="form-card" style="margin:0">
+     <div style="text-align:center;font-size:34px">${cat[0]}</div>
+     <div style="text-align:center;font-size:24px;font-weight:850;margin:8px 0;color:${t.type==="income"?"var(--green)":"var(--red)"}">
+       ${t.type==="income"?"+":"−"}${money(t.amount).slice(1)}
+     </div>
+     <div style="text-align:center;font-size:14px;font-weight:750">${escapeHTML(t.description)}</div>
+     <div style="text-align:center;color:var(--muted);font-size:11px;margin-top:4px">${formatDate(t.date)} · ${escapeHTML(t.category)}</div>
+     <div style="margin-top:18px;border-top:1px solid var(--line);padding-top:12px">
+       <div class="setting-desc">Account</div>
+       <div style="font-size:13px;margin-bottom:10px">${account?.icon||"💰"} ${escapeHTML(account?.name||"Unknown")}</div>
+       ${t.notes?`<div class="setting-desc">Notes</div><div style="font-size:12px;line-height:1.5">${escapeHTML(t.notes)}</div>`:""}
+     </div>
+     <button class="btn btn-danger" style="width:100%;margin-top:16px" onclick="closeModal('simpleModal');openConfirm('deleteTransaction','${t.id}')">Delete transaction</button>
+   </div>`;
+ document.getElementById("simpleModal").classList.add("show");
+}
+
+function deleteTransaction(id){
+ data.transactions=data.transactions.filter(t=>t.id!==id);
+ persist();renderAll();toast("Transaction deleted");
+}
+
+function renderAccounts(){
+ const total=data.accounts.reduce((s,a)=>s+accountBalance(a.id),0);
+ document.getElementById("accountTotal").textContent=money(total);
+
+ document.getElementById("accountList").innerHTML=data.accounts.map(a=>{
+   const bal=accountBalance(a.id);
+   const txCount=data.transactions.filter(t=>t.accountId===a.id).length;
+   return `
+   <div class="account-card">
+     <div class="account-top">
+       <div class="account-icon">${a.icon}</div>
+       <div class="account-main">
+         <div class="account-name">${escapeHTML(a.name)}</div>
+         <div class="account-type">${escapeHTML(a.type)} · ${txCount} transactions</div>
+       </div>
+       <button class="goal-menu" onclick="openAccountActions('${a.id}')">⋮</button>
+     </div>
+     <div class="account-bal">${money(bal)}</div>
+     <div class="account-actions">
+       <button class="mini-btn" onclick="openMoneyModalForAccount('income','${a.id}')">＋ Add</button>
+       <button class="mini-btn" onclick="openMoneyModalForAccount('expense','${a.id}')">− Spend</button>
+       ${a.id!=="default"?`<button class="mini-btn" onclick="openConfirm('deleteAccount','${a.id}')">Delete</button>`:""}
+     </div>
+   </div>`;
+ }).join("");
+}
+
+function openMoneyModalForAccount(type,id){
+ openMoneyModal(type);
+ document.getElementById("moneyAccount").value=id;
+}
+
+function openAccountModal(){
+ document.getElementById("accountName").value="";
+ document.getElementById("accountBalance").value="";
+ document.getElementById("accountType").value="Savings";
+ document.getElementById("accountIcon").value="💰";
+ document.getElementById("accountModal").classList.add("show");
+}
+
+function saveAccount(){
+ const name=document.getElementById("accountName").value.trim();
+ const balance=Number(document.getElementById("accountBalance").value)||0;
+ const type=document.getElementById("accountType").value;
+ const icon=document.getElementById("accountIcon").value;
+
+ if(!name){toast("Enter an account name");return}
+ if(balance<0){toast("Starting balance cannot be negative");return}
+
+ const account={
+   id:uid("acc"),name,type,balance,icon,created:Date.now()
+ };
+
+ data.accounts.push(account);
+ persist();closeModal("accountModal");renderAccounts();toast("Account added");
+}
+
+function openAccountActions(id){
+ const a=data.accounts.find(x=>x.id===id);
+ if(!a)return;
+
+ document.getElementById("simpleTitle").textContent=a.name;
+ document.getElementById("simpleContent").innerHTML=`
+   <button class="setting" style="width:100%;text-align:left" onclick="closeModal('simpleModal');editAccount('${id}')">
+     <div class="setting-title">Edit account</div><div class="setting-desc">Change account name and type</div>
+   </button>
+   <button class="setting" style="width:100%;text-align:left" onclick="closeModal('simpleModal');openConfirm('deleteAccount','${id}')">
+     <div class="setting-title danger">Delete account</div><div class="setting-desc">Transactions using it will remain recorded</div>
+   </button>`;
+ document.getElementById("simpleModal").classList.add("show");
+}
+
+function editAccount(id){
+ const a=data.accounts.find(x=>x.id===id);
+ if(!a)return;
+ document.getElementById("simpleTitle").textContent="Edit account";
+ document.getElementById("simpleContent").innerHTML=`
+   <label>Account name</label><input id="editAccName" class="field" value="${escapeHTML(a.name)}">
+   <label>Account type</label>
+   <select id="editAccType" class="field">
+     ${["Cash","Savings","Bank","Wallet","Other"].map(x=>`<option ${x===a.type?"selected":""}>${x}</option>`).join("")}
+   </select>
+   <button class="full" onclick="updateAccount('${id}')">Save changes</button>`;
+ document.getElementById("simpleModal").classList.add("show");
+}
+
+function updateAccount(id){
+ const a=data.accounts.find(x=>x.id===id);
+ if(!a)return;
+ const name=document.getElementById("editAccName").value.trim();
+ if(!name){toast("Enter an account name");return}
+ a.name=name;a.type=document.getElementById("editAccType").value;
+ persist();closeModal("simpleModal");renderAccounts();renderHome();toast("Account updated");
+}
+
+function deleteAccount(id){
+ if(id==="default"){toast("The main account cannot be deleted");return}
+ const fallback=data.accounts.find(a=>a.id==="default");
+ data.transactions.forEach(t=>{if(t.accountId===id)t.accountId=fallback.id});
+ data.accounts=data.accounts.filter(a=>a.id!==id);
+ persist();renderAll();toast("Account deleted");
+}
+
+function renderGoals(){
+ const el=document.getElementById("goalList");
+
+ if(!data.goals.length){
+   el.innerHTML=`<div class="empty"><div class="empty-icon">🎯</div><strong>No savings goals yet</strong>Create a target and track your progress toward it.</div>`;
+   return;
+ }
+
+ el.innerHTML=data.goals.map(g=>{
+   const p=Math.min(100,(Number(g.saved)/Number(g.target))*100);
+   const remaining=Math.max(0,g.target-g.saved);
+   return `
+   <div class="goal-card">
+     <div class="goal-head">
+       <div class="goal-icon">${g.icon||"🎯"}</div>
+       <div class="goal-info">
+         <div class="goal-name">${escapeHTML(g.name)}</div>
+         <div class="goal-target">${money(g.saved)} of ${money(g.target)}${g.targetDate?" · "+formatDate(g.targetDate):""}</div>
+       </div>
+       <button class="goal-menu" onclick="openGoalActions('${g.id}')">⋮</button>
+     </div>
+     <div class="progress"><i style="width:${p}%"></i></div>
+     <div class="goal-foot"><span>${money(remaining)} remaining</span><b>${p.toFixed(0)}%</b></div>
+   </div>`;
+ }).join("");
+}
+
+function saveGoal(){
+ const name=document.getElementById("goalName").value.trim();
+ const target=Number(document.getElementById("goalTarget").value);
+ const saved=Number(document.getElementById("goalSaved").value)||0;
+ const targetDate=document.getElementById("goalDate").value;
+ const icon=document.getElementById("goalIcon").value;
+
+ if(!name){toast("Enter a goal name");return}
+ if(!target||target<=0){toast("Enter a valid target");return}
+ if(saved<0){toast("Saved amount cannot be negative");return}
+
+ data.goals.push({
+   id:uid("goal"),name,target,saved:Math.min(saved,target),targetDate,icon,created:Date.now()
+ });
+
+ persist();closeModal("goalModal");renderGoals();toast("Savings goal created");
+}
+
+function openGoalActions(id){
+ const g=data.goals.find(x=>x.id===id);
+ if(!g)return;
+
+ document.getElementById("simpleTitle").textContent=g.name;
+ document.getElementById("simpleContent").innerHTML=`
+   <button class="setting" style="width:100%;text-align:left" onclick="closeModal('simpleModal');addToGoal('${id}')">
+     <div class="setting-title">Add savings</div><div class="setting-desc">Increase the amount saved toward this goal</div>
+   </button>
+   <button class="setting" style="width:100%;text-align:left" onclick="closeModal('simpleModal');editGoal('${id}')">
+     <div class="setting-title">Edit goal</div><div class="setting-desc">Change target, date or name</div>
+   </button>
+   <button class="setting" style="width:100%;text-align:left" onclick="closeModal('simpleModal');openConfirm('deleteGoal','${id}')">
+     <div class="setting-title danger">Delete goal</div><div class="setting-desc">Remove this goal</div>
+   </button>`;
+ document.getElementById("simpleModal").classList.add("show");
+}
+
+function addToGoal(id){
+ const g=data.goals.find(x=>x.id===id);
+ if(!g)return;
+
+ document.getElementById("simpleTitle").textContent="Add savings";
+ document.getElementById("simpleContent").innerHTML=`
+   <div style="text-align:center;color:var(--muted);font-size:11px;margin-bottom:14px">
+     ${escapeHTML(g.name)} · ${money(g.saved)} of ${money(g.target)}
+   </div>
+   <label>Amount to add</label>
+   <input id="goalAddAmount" class="field amount-field" type="number" min=".01" placeholder="₹ 0">
+   <button class="full" onclick="applyGoalAdd('${id}')">Add to goal</button>`;
+ document.getElementById("simpleModal").classList.add("show");
+}
+
+function applyGoalAdd(id){
+ const g=data.goals.find(x=>x.id===id);
+ const n=Number(document.getElementById("goalAddAmount").value);
+ if(!g||!n||n<=0){toast("Enter a valid amount");return}
+ g.saved=Math.min(g.target,g.saved+n);
+ persist();closeModal("simpleModal");renderGoals();toast("Savings goal updated");
+}
+
+function editGoal(id){
+ const g=data.goals.find(x=>x.id===id);
+ if(!g)return;
+ document.getElementById("simpleTitle").textContent="Edit goal";
+ document.getElementById("simpleContent").innerHTML=`
+   <label>Name</label><input id="editGoalName" class="field" value="${escapeHTML(g.name)}">
+   <label>Target amount</label><input id="editGoalTarget" class="field" type="number" value="${g.target}">
+   <label>Target date</label><input id="editGoalDate" class="field" type="date" value="${g.targetDate||""}">
+   <button class="full" onclick="updateGoal('${id}')">Save changes</button>`;
+ document.getElementById("simpleModal").classList.add("show");
+}
+
+function updateGoal(id){
+ const g=data.goals.find(x=>x.id===id);
+ if(!g)return;
+ const name=document.getElementById("editGoalName").value.trim();
+ const target=Number(document.getElementById("editGoalTarget").value);
+ if(!name||!target||target<=0){toast("Enter valid goal details");return}
+ g.name=name;g.target=target;g.saved=Math.min(g.saved,target);g.targetDate=document.getElementById("editGoalDate").value;
+ persist();closeModal("simpleModal");renderGoals();toast("Goal updated");
+}
+
+function deleteGoal(id){
+ data.goals=data.goals.filter(g=>g.id!==id);
+ persist();renderGoals();toast("Goal deleted");
+}
+
+function renderBudgets(){
+ const month=currentMonth();
+ const totals=monthTotals(month);
+ document.getElementById("budgetMonth").textContent=new Date().toLocaleDateString("en-IN",{month:"long",year:"numeric"});
+
+ const el=document.getElementById("budgetList");
+
+ if(!data.budgets.length){
+   el.innerHTML=`<div class="empty"><div class="empty-icon">🛡️</div><strong>No budgets yet</strong>Create category limits to keep your spending under control.</div>`;
+   return;
+ }
+
+ el.innerHTML=data.budgets.map(b=>{
+   const spent=data.transactions
+    .filter(t=>t.type==="expense"&&t.date.startsWith(month)&&t.category===b.category)
+    .reduce((s,t)=>s+Number(t.amount),0);
+   const p=Math.min(100,spent/b.amount*100);
+   const remaining=Math.max(0,b.amount-spent);
+   return `
+   <div class="budget-card">
+     <div class="budget-head">
+       <div class="budget-name">${expenseCategories[b.category]?.[0]||"📦"} ${escapeHTML(b.category)}</div>
+       <button class="goal-menu" onclick="openConfirm('deleteBudget','${b.id}')">⋮</button>
+     </div>
+     <div class="progress"><i style="width:${p}%;background:${p>=100?"var(--red)":p>=80?"var(--yellow)":"linear-gradient(90deg,var(--accent),#a59fff)"}"></i></div>
+     <div class="budget-status">
+       <span>${money(spent)} spent of ${money(b.amount)}</span>
+       <span>${remaining?money(remaining)+" left":"Limit reached"}</span>
+     </div>
+   </div>`;
+ }).join("");
+}
+
+function openBudgetModal(){
+ document.getElementById("budgetCategory").innerHTML=Object.keys(expenseCategories).map(c=>`<option value="${c}">${expenseCategories[c][0]} ${c}</option>`).join("");
+ document.getElementById("budgetAmount").value="";
+ document.getElementById("budgetModal").classList.add("show");
+}
+
+function saveBudget(){
+ const category=document.getElementById("budgetCategory").value;
+ const amount=Number(document.getElementById("budgetAmount").value);
+
+ if(!amount||amount<=0){toast("Enter a valid budget");return}
+
+ const existing=data.budgets.find(b=>b.category===category);
+ if(existing){
+   existing.amount=amount;
+   persist();closeModal("budgetModal");renderBudgets();toast("Budget updated");
+   return;
+ }
+
+ data.budgets.push({id:uid("budget"),category,amount,created:Date.now()});
+ persist();closeModal("budgetModal");renderBudgets();toast("Budget created");
+}
+
+function deleteBudget(id){
+ data.budgets=data.budgets.filter(b=>b.id!==id);
+ persist();renderBudgets();toast("Budget deleted");
+}
+
+function renderRecurring(){
+ const el=document.getElementById("recurringList");
+
+ if(!data.recurring.length){
+   el.innerHTML=`<div class="empty"><div class="empty-icon">🔁</div><strong>No recurring items</strong>Add regular expenses or expected income so you don't forget them.</div>`;
+   return;
+ }
+
+ el.innerHTML=[...data.recurring].sort((a,b)=>a.nextDate.localeCompare(b.nextDate)).map(r=>`
+   <div class="account-card">
+     <div class="account-top">
+       <div class="account-icon">${r.type==="income"?"↗":"↘"}</div>
+       <div class="account-main">
+         <div class="account-name">${escapeHTML(r.name)}</div>
+         <div class="account-type">${escapeHTML(r.frequency)} · Next ${formatDate(r.nextDate)}</div>
+       </div>
+       <button class="goal-menu" onclick="openRecurringActions('${r.id}')">⋮</button>
+     </div>
+     <div class="account-bal ${r.type==="income"?"green":"red"}">${r.type==="income"?"+":"−"}${money(r.amount).slice(1)}</div>
+     <div style="margin-top:8px"><span class="badge">${escapeHTML(r.category)}</span> <span class="badge">${r.active?"Active":"Paused"}</span></div>
+   </div>
+ `).join("");
+}
+
+function openRecurringModal(){
+ currentRecurringType="expense";
+ document.getElementById("recName").value="";
+ document.getElementById("recAmount").value="";
+ document.getElementById("recDate").value=today();
+ document.getElementById("recFrequency").value="monthly";
+ document.getElementById("recIn").className="";
+ document.getElementById("recOut").className="active out";
+
+ const cats=expenseCategories;
+ document.getElementById("recCategory").innerHTML=Object.keys(cats).map(c=>`<option value="${c}">${cats[c][0]} ${c}</option>`).join("");
+
+ document.getElementById("recurringModal").classList.add("show");
+}
+
+function setRecurringType(type){
+ currentRecurringType=type;
+ document.getElementById("recIn").className=type==="income"?"active in":"";
+ document.getElementById("recOut").className=type==="expense"?"active out":"";
+
+ const cats=type==="income"?incomeCategories:expenseCategories;
+ document.getElementById("recCategory").innerHTML=Object.keys(cats).map(c=>`<option value="${c}">${cats[c][0]} ${c}</option>`).join("");
+}
+
+function saveRecurring(){
+ const name=document.getElementById("recName").value.trim();
+ const amount=Number(document.getElementById("recAmount").value);
+ const frequency=document.getElementById("recFrequency").value;
+ const nextDate=document.getElementById("recDate").value||today();
+ const category=document.getElementById("recCategory").value;
+
+ if(!name){toast("Enter a name");return}
+ if(!amount||amount<=0){toast("Enter a valid amount");return}
+
+ data.recurring.push({
+   id:uid("rec"),name,amount,frequency,nextDate,category,type:currentRecurringType,active:true,created:Date.now()
+ });
+
+ persist();closeModal("recurringModal");renderRecurring();renderHome();toast("Recurring item added");
+}
+
+function openRecurringActions(id){
+ const r=data.recurring.find(x=>x.id===id);
+ if(!r)return;
+
+ document.getElementById("simpleTitle").textContent=r.name;
+ document.getElementById("simpleContent").innerHTML=`
+   <button class="setting" style="width:100%;text-align:left" onclick="toggleRecurring('${id}')">
+     <div class="setting-title">${r.active?"Pause":"Resume"} item</div><div class="setting-desc">${r.active?"Temporarily stop showing it as active":"Make this item active again"}</div>
+   </button>
+   <button class="setting" style="width:100%;text-align:left" onclick="closeModal('simpleModal');openConfirm('deleteRecurring','${id}')">
+     <div class="setting-title danger">Delete item</div><div class="setting-desc">Remove this recurring item</div>
+   </button>`;
+ document.getElementById("simpleModal").classList.add("show");
+}
+
+function toggleRecurring(id){
+ const r=data.recurring.find(x=>x.id===id);
+ if(!r)return;
+ r.active=!r.active;
+ persist();closeModal("simpleModal");renderRecurring();renderHome();toast(r.active?"Recurring item resumed":"Recurring item paused");
+}
+
+function deleteRecurring(id){
+ data.recurring=data.recurring.filter(r=>r.id!==id);
+ persist();renderRecurring();renderHome();toast("Recurring item deleted");
+}
+
+function renderStats(){
+ const totals=monthTotals();
+ const saved=totals.income-totals.expense;
+
+ document.getElementById("statsMonth").textContent=new Date().toLocaleDateString("en-IN",{month:"long"});
+ document.getElementById("statsIncome").textContent=shortMoney(totals.income);
+ document.getElementById("statsExpense").textContent=shortMoney(totals.expense);
+ document.getElementById("statsSaved").textContent=shortMoney(saved);
+
+ const days=[];
+ for(let i=6;i>=0;i--){
+   const d=new Date();
+   d.setDate(d.getDate()-i);
+   days.push(d.toISOString().slice(0,10));
+ }
+
+ const vals=days.map(d=>data.transactions
+  .filter(t=>t.type==="expense"&&t.date===d)
+  .reduce((s,t)=>s+Number(t.amount),0));
+
+ const max=Math.max(...vals,1);
+
+ document.getElementById("weeklyChart").innerHTML=vals.map((v,i)=>{
+   const h=Math.max(3,(v/max)*125);
+   const label=new Date(days[i]+"T12:00:00").toLocaleDateString("en-IN",{weekday:"short"});
+   return `<div class="chart-col"><div class="chart-bar" style="height:${h}px"></div><div class="chart-label">${label}</div></div>`;
+ }).join("");
+
+ const cats={};
+ data.transactions
+ .filter(t=>t.type==="expense"&&t.date.startsWith(currentMonth()))
+ .forEach(t=>cats[t.category]=(cats[t.category]||0)+Number(t.amount));
+
+ const sorted=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+ const total=sorted.reduce((s,[,v])=>s+v,0);
+
+ document.getElementById("statsTotal").textContent=money(total);
+
+ document.getElementById("categoryStats").innerHTML=sorted.length
+ ?sorted.map(([cat,val])=>`
+   <div class="category-stat">
+     <span class="category-dot"></span>
+     <span class="category-name">${expenseCategories[cat]?.[0]||"📦"} ${escapeHTML(cat)}</span>
+     <span class="category-val">${money(val)}</span>
+     <span class="category-pct">${total?(val/total*100).toFixed(0):0}%</span>
+   </div>`).join("")
+ :`<div class="empty">No spending recorded this month.</div>`;
+
+ const monthDays=Math.max(1,new Date().getDate());
+ document.getElementById("habitAvg").textContent=money(totals.expense/monthDays);
+
+ const expenses=data.transactions.filter(t=>t.type==="expense");
+ const largest=expenses.length?Math.max(...expenses.map(t=>Number(t.amount))):0;
+ document.getElementById("habitLargest").textContent=money(largest);
+ document.getElementById("habitCount").textContent=data.transactions.length;
+}
+
+function renderSettings(){
+ const pinToggle=document.getElementById("pinToggle");
+ pinToggle.classList.toggle("on",data.settings.pinEnabled);
+ document.getElementById("themeText").textContent=data.settings.theme==="light"?"Light mode":"Dark mode";
+ document.getElementById("currencyText").textContent=data.settings.currency==="INR"?"Indian Rupee (₹)":`${data.settings.currency} (${data.settings.currencySymbol})`;
+}
+
+function toggleTheme(){
+ data.settings.theme=data.settings.theme==="dark"?"light":"dark";
+ document.body.classList.toggle("light",data.settings.theme==="light");
+ persist();renderSettings();toast(data.settings.theme==="light"?"Light mode enabled":"Dark mode enabled");
+}
+
+function openCurrencyModal(){
+ document.getElementById("simpleTitle").textContent="Currency";
+ document.getElementById("simpleContent").innerHTML=`
+   <label>Select currency</label>
+   <select id="currencySelect" class="field">
+     <option value="INR">🇮🇳 Indian Rupee — ₹</option>
+     <option value="USD">🇺🇸 US Dollar — $</option>
+     <option value="EUR">🇪🇺 Euro — €</option>
+     <option value="GBP">🇬🇧 Pound — £</option>
+     <option value="JPY">🇯🇵 Yen — ¥</option>
+     <option value="AED">🇦🇪 Dirham — د.إ</option>
+     <option value="CAD">🇨🇦 Canadian Dollar — C$</option>
+     <option value="AUD">🇦🇺 Australian Dollar — A$</option>
+   </select>
+   <button class="full" onclick="saveCurrency()">Save currency</button>`;
+ document.getElementById("currencySelect").value=data.settings.currency;
+ document.getElementById("simpleModal").classList.add("show");
+}
+
+function saveCurrency(){
+ const map={
+   INR:["₹","Indian Rupee (₹)"],USD:["$","US Dollar ($)"],EUR:["€","Euro (€)"],GBP:["£","Pound (£)"],
+   JPY:["¥","Yen (¥)"],AED:["د.إ","Dirham (د.إ)"],CAD:["C$","Canadian Dollar (C$)"],AUD:["A$","Australian Dollar (A$)"]
+ };
+ const c=document.getElementById("currencySelect").value;
+ data.settings.currency=c;
+ data.settings.currencySymbol=map[c][0];
+ persist();closeModal("simpleModal");renderAll();toast("Currency updated");
+}
+
+function exportData(){
+ const payload={
+   app:"Purse",
+   formatVersion:1,
+   exportedAt:new Date().toISOString(),
+   data
+ };
+
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;
+ a.download="purse-backup-"+today()+".json";
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+ toast("Backup exported");
+}
+
+function importData(){
+ document.getElementById("importFile").click();
+}
+
+document.getElementById("importFile").addEventListener("change",function(e){
+ const file=e.target.files[0];
+ if(!file)return;
+
+ const reader=new FileReader();
+
+ reader.onload=function(){
+   try{
+     const parsed=JSON.parse(reader.result);
+     const incoming=parsed.data||parsed;
+
+     if(!incoming||!Array.isArray(incoming.transactions)||!Array.isArray(incoming.accounts)){
+       throw new Error("Invalid backup");
+     }
+
+     window.pendingImport=incoming;
+     openConfirm("importData");
+   }catch(err){
+     toast("Invalid Purse backup");
+   }
+
+   e.target.value="";
+ };
+
+ reader.readAsText(file);
+});
+
+function performImport(){
+ if(!window.pendingImport)return;
+ data={
+   ...structuredClone(defaultData),
+   ...window.pendingImport,
+   settings:{...defaultData.settings,...(window.pendingImport.settings||{})}
+ };
+ persist();
+ window.pendingImport=null;
+ renderAll();
+ toast("Backup restored");
+}
+
+function openDataInfo(){
+ document.getElementById("simpleTitle").textContent="Your data";
+ document.getElementById("simpleContent").innerHTML=`
+   <div class="form-card">
+     <div class="stat-three">
+       <div class="stat-mini"><strong>${data.transactions.length}</strong><span>Transactions</span></div>
+       <div class="stat-mini"><strong>${data.goals.length}</strong><span>Goals</span></div>
+       <div class="stat-mini"><strong>${data.budgets.length}</strong><span>Budgets</span></div>
+     </div>
+     <div style="margin-top:15px;font-size:11px;color:var(--muted);line-height:1.6">
+       Your Purse records are stored locally using your browser/device storage. Export a backup regularly if the data matters to you.
+     </div>
+   </div>`;
+ document.getElementById("simpleModal").classList.add("show");
+}
+
+function openNotifications(){
+ const upcoming=data.recurring.filter(r=>r.active).sort((a,b)=>a.nextDate.localeCompare(b.nextDate)).slice(0,5);
+ const budgetWarnings=data.budgets.map(b=>{
+   const spent=data.transactions.filter(t=>t.type==="expense"&&t.date.startsWith(currentMonth())&&t.category===b.category).reduce((s,t)=>s+t.amount,0);
+   return {b,spent};
+ }).filter(x=>x.spent>=x.b.amount*.8);
+
+ let html="";
+
+ if(budgetWarnings.length){
+   html+=budgetWarnings.map(x=>`
+     <div class="setting">
+       <div class="setting-title">⚠️ ${escapeHTML(x.b.category)} budget</div>
+       <div class="setting-desc">${money(x.spent)} of ${money(x.b.amount)} used</div>
+     </div>`).join("");
+ }
+
+ if(upcoming.length){
+   html+=upcoming.map(r=>`
+     <div class="setting">
+       <div class="setting-title">📅 ${escapeHTML(r.name)}</div>
+       <div class="setting-desc">${money(r.amount)} · ${formatDate(r.nextDate)}</div>
+     </div>`).join("");
+ }
+
+ if(!html)html=`<div class="empty"><div class="empty-icon">🔔</div><strong>You're all caught up</strong>No budget warnings or upcoming recurring items.</div>`;
+
+ document.getElementById("simpleTitle").textContent="Notifications";
+ document.getElementById("simpleContent").innerHTML=html;
+ document.getElementById("simpleModal").classList.add("show");
+}
+
+function openConfirm(action,id=null){
+ confirmAction={action,id};
+
+ const configs={
+  deleteAll:{
+   icon:"🗑️",title:"Delete all data?",
+   text:"This will permanently remove <strong>all transactions, accounts, goals, budgets and recurring items</strong> from this device.",
+   button:"Delete everything"
+  },
+  deleteTransaction:{
+   icon:"🗑️",title:"Delete transaction?",
+   text:"This transaction will be permanently removed from your Purse records.",
+   button:"Delete transaction"
+  },
+  deleteAccount:{
+   icon:"🗑️",title:"Delete account?",
+   text:"The account will be removed. Existing transactions will remain and be moved to your main account.",
+   button:"Delete account"
+  },
+  deleteGoal:{
+   icon:"🗑️",title:"Delete savings goal?",
+   text:"This savings goal and its progress will be removed.",
+   button:"Delete goal"
+  },
+  deleteBudget:{
+   icon:"🗑️",title:"Delete budget?",
+   text:"This category budget will be removed. Your transactions will not be affected.",
+   button:"Delete budget"
+  },
+  deleteRecurring:{
+   icon:"🗑️",title:"Delete recurring item?",
+   text:"This scheduled item will be removed from your recurring list.",
+   button:"Delete item"
+  },
+  importData:{
+   icon:"📥",title:"Restore this backup?",
+   text:"Restoring the backup will <strong>replace your current Purse data</strong> with the selected backup.",
+   button:"Restore backup"
+  }
+ };
+
+ const c=configs[action];
+ document.getElementById("confirmIcon").textContent=c.icon;
+ document.getElementById("confirmTitle").textContent=c.title;
+ document.getElementById("confirmText").innerHTML=c.text;
+ document.getElementById("confirmAction").textContent=c.button;
+ document.getElementById("confirmAction").onclick=executeConfirm;
+
+ document.getElementById("confirmModal").classList.add("show");
+}
+
+function executeConfirm(){
+ if(!confirmAction)return;
+ const {action,id}=confirmAction;
+
+ closeModal("confirmModal");
+
+ if(action==="deleteAll"){
+   data=structuredClone(defaultData);
+   persist();renderAll();toast("All data deleted");
+ }
+
+ if(action==="deleteTransaction")deleteTransaction(id);
+ if(action==="deleteAccount")deleteAccount(id);
+ if(action==="deleteGoal")deleteGoal(id);
+ if(action==="deleteBudget")deleteBudget(id);
+ if(action==="deleteRecurring")deleteRecurring(id);
+ if(action==="importData")performImport();
+
+ confirmAction=null;
+}
+
+function togglePin(event){
+ if(event)event.stopPropagation();
+
+ if(data.settings.pinEnabled){
+   openConfirmCustom(
+     "Disable app lock?",
+     "Your PIN will be removed and Purse will no longer require it when opened.",
+     "Disable lock",
+     ()=>{
+       data.settings.pinEnabled=false;
+       data.settings.pin="";
+       persist();
+       renderSettings();
+       toast("App lock disabled");
+     }
+   );
+ }else{
+   openPinSetup();
+ }
+}
+
+function openConfirmCustom(title,text,button,action){
+ document.getElementById("confirmIcon").textContent="🔐";
+ document.getElementById("confirmTitle").textContent=title;
+ document.getElementById("confirmText").innerHTML=text;
+ document.getElementById("confirmAction").textContent=button;
+ document.getElementById("confirmAction").onclick=()=>{
+   closeModal("confirmModal");
+   action();
+ };
+ document.getElementById("confirmModal").classList.add("show");
+}
+
+function openPinSetup(){
+ pinMode="setup";
+ pinBuffer="";
+ showPin("Create a 4-digit PIN");
+}
+
+function showPin(message){
+ document.getElementById("pinMessage").textContent=message;
+ document.getElementById("pinDots").innerHTML=[0,1,2,3].map(i=>
+   `<i class="pin-dot ${i<pinBuffer.length?"on":""}"></i>`
+ ).join("");
+ document.getElementById("pinScreen").classList.add("show");
+}
+
+function pinInput(value){
+ if(value==="clear"){
+   pinBuffer=pinBuffer.slice(0,-1);
+   showPin(document.getElementById("pinMessage").textContent);
+   return;
+ }
+
+ if(value==="cancel"){
+   pinBuffer="";
+   document.getElementById("pinScreen").classList.remove("show");
+   return;
+ }
+
+ if(pinBuffer.length>=4)return;
+
+ pinBuffer+=value;
+ showPin(document.getElementById("pinMessage").textContent);
+
+ if(pinBuffer.length===4)setTimeout(processPin,160);
+}
+
+function processPin(){
+ if(pinMode==="unlock"){
+   if(pinBuffer===data.settings.pin){
+     pinUnlocked=true;
+     pinBuffer="";
+     document.getElementById("pinScreen").classList.remove("show");
+   }else{
+     pinBuffer="";
+     showPin("Incorrect PIN");
+   }
+   return;
+ }
+
+ if(pinMode==="setup"){
+   data.settings.pin=pinBuffer;
+   data.settings.pinEnabled=true;
+   persist();
+   pinBuffer="";
+   document.getElementById("pinScreen").classList.remove("show");
+   renderSettings();
+   toast("App lock enabled");
+ }
+}
+
+function closeModal(id){
+ const el=document.getElementById(id);
+ if(el)el.classList.remove("show");
+}
+
+document.querySelectorAll(".modal-bg").forEach(bg=>{
+ bg.addEventListener("click",e=>{
+   if(e.target===bg)bg.classList.remove("show");
+ });
+});
+
+function toast(message){
+ const el=document.getElementById("toast");
+ el.textContent=message;
+ el.classList.add("show");
+ clearTimeout(window.toastTimer);
+ window.toastTimer=setTimeout(()=>el.classList.remove("show"),2200);
+}
+
+function renderAll(){
+ renderHome();
+ renderTransactions();
+ renderAccounts();
+ renderGoals();
+ renderBudgets();
+ renderRecurring();
+ renderStats();
+ renderSettings();
+}
+
+function applyTheme(){
+ document.body.classList.toggle("light",data.settings.theme==="light");
+}
+
+function init(){
+ applyTheme();
+ renderAll();
+
+ if(data.settings.pinEnabled&&!pinUnlocked){
+   pinMode="unlock";
+   pinBuffer="";
+   showPin("Enter your PIN");
+ }
+}
+
+init();
+</script>
+</body>
+</html>
