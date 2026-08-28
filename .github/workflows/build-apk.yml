@@ -35,27 +35,38 @@ jobs:
         run: npx cap sync android
 
       - name: Install ImageMagick
-        run: sudo apt-get update && sudo apt-get install -y imagemagick
-
-      - name: Generate Android launcher icons
         run: |
-          mkdir -p android/app/src/main/res/mipmap-mdpi
-          mkdir -p android/app/src/main/res/mipmap-hdpi
-          mkdir -p android/app/src/main/res/mipmap-xhdpi
-          mkdir -p android/app/src/main/res/mipmap-xxhdpi
-          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
 
-          convert pocki-icon-1080.png -resize 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-          convert pocki-icon-1080.png -resize 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-          convert pocki-icon-1080.png -resize 96x96 android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-          convert pocki-icon-1080.png -resize 144x144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-          convert pocki-icon-1080.png -resize 192x192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+      - name: Replace Android launcher icon
+        run: |
+          RES="android/app/src/main/res"
 
-          cp android/app/src/main/res/mipmap-mdpi/ic_launcher.png android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
-          cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
-          cp android/app/src/main/res/mipmap-xhdpi/ic_launcher.png android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
-          cp android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
-          cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+          # Remove Capacitor's generated adaptive launcher icons
+          rm -rf "$RES/mipmap-anydpi-v26"
+          rm -rf "$RES/mipmap-anydpi"
+
+          # Create launcher icon folders
+          mkdir -p "$RES/mipmap-mdpi"
+          mkdir -p "$RES/mipmap-hdpi"
+          mkdir -p "$RES/mipmap-xhdpi"
+          mkdir -p "$RES/mipmap-xxhdpi"
+          mkdir -p "$RES/mipmap-xxxhdpi"
+
+          # Generate Android launcher icon sizes
+          convert pocki-icon-1080.png -resize 48x48 "$RES/mipmap-mdpi/ic_launcher.png"
+          convert pocki-icon-1080.png -resize 72x72 "$RES/mipmap-hdpi/ic_launcher.png"
+          convert pocki-icon-1080.png -resize 96x96 "$RES/mipmap-xhdpi/ic_launcher.png"
+          convert pocki-icon-1080.png -resize 144x144 "$RES/mipmap-xxhdpi/ic_launcher.png"
+          convert pocki-icon-1080.png -resize 192x192 "$RES/mipmap-xxxhdpi/ic_launcher.png"
+
+          # Round launcher icon
+          cp "$RES/mipmap-mdpi/ic_launcher.png" "$RES/mipmap-mdpi/ic_launcher_round.png"
+          cp "$RES/mipmap-hdpi/ic_launcher.png" "$RES/mipmap-hdpi/ic_launcher_round.png"
+          cp "$RES/mipmap-xhdpi/ic_launcher.png" "$RES/mipmap-xhdpi/ic_launcher_round.png"
+          cp "$RES/mipmap-xxhdpi/ic_launcher.png" "$RES/mipmap-xxhdpi/ic_launcher_round.png"
+          cp "$RES/mipmap-xxxhdpi/ic_launcher.png" "$RES/mipmap-xxxhdpi/ic_launcher_round.png"
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -66,9 +77,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build debug APK
+      - name: Build Pocki APK
         working-directory: android
-        run: ./gradlew assembleDebug
+        run: ./gradlew clean assembleDebug
 
       - name: Upload Pocki APK
         uses: actions/upload-artifact@v4
