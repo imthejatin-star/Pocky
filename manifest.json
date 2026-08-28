@@ -4,7 +4,21 @@
   "description": "Personal money and savings management",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0b0f19",
-  "theme_color": "#0b0f19",
-  "orientation": "portrait"
+  "background_color": "#080b10",
+  "theme_color": "#080b10",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "pocki-icon-520.png",
+      "sizes": "520x520",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "pocki-icon-1080.png",
+      "sizes": "1080x1080",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
