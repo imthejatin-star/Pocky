@@ -101,7 +101,7 @@ input:focus,select:focus{border-color:var(--accent)}.formRow{display:grid;grid-t
 <div class="liveNumber" id="liveNumber">0</div>
 <div class="wheelInstruction"></div>
 <div class="vaultButtons">
-<button class="vaultBtn" onclick="vaultUndo()">UNDO</button>
+<button class="vaultBtn" onclick="vaultUndo()">AUTHORISED ONLY</button>
 </div>
 <div id="lockStatus" class="lockStatus">Drag the wheel with your finger.</div>
 <div id="vaultLight" class="light"></div>
@@ -247,7 +247,7 @@ input:focus,select:focus{border-color:var(--accent)}.formRow{display:grid;grid-t
 <div class="sequenceDots" id="sequenceDots"></div>
 <div id="setupStatus" class="lockStatus">Choose the first number.</div>
 <div class="formRow" style="margin-top:16px">
-<button class="btn" onclick="setupUndo()">Undo</button>
+<button class="btn" onclick="setupUndo()"></button>
 <button class="btn primary" onclick="finishLockSetup()">Save Passcode</button>
 </div>
 </div></div>
@@ -1038,4 +1038,4 @@ if(data.security.enabled&&data.security.sequence.length>0){
 }
 </script>
 </body>
- </html>
+</html>
