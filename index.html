@@ -2,1393 +2,981 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#07090d">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08090d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Pocki</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="pocki-icon-520.png">
 <link rel="apple-touch-icon" href="pocki-icon-520.png">
+<title>Pocki — Money Manager</title>
 
 <style>
 :root{
- --bg:#07090d;--bg2:#0c1017;--card:#10151d;--card2:#151d27;
- --line:rgba(255,255,255,.08);--text:#f5f7fa;--muted:#8993a3;
- --green:#35d39a;--green2:#16a873;--red:#ff5f6d;--yellow:#f4c95d;
- --blue:#61a8ff;--purple:#9b7cff;--shadow:0 20px 60px rgba(0,0,0,.38);
- --radius:22px;
+--bg:#08090d;--panel:#101219;--panel2:#151821;--line:#282d38;
+--text:#f4f5f7;--muted:#9298a6;--accent:#b9ff58;
+--green:#7dffb2;--red:#ff7185;--blue:#78aaff;--yellow:#ffd166
 }
-
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:700px;margin:auto;min-height:100vh;padding-bottom:105px}
 
-html,body{
- margin:0;min-height:100%;background:var(--bg);color:var(--text);
- font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+.top{
+position:sticky;top:0;z-index:20;padding:17px 17px 12px;
+background:linear-gradient(180deg,rgba(8,9,13,.98),rgba(8,9,13,.86),transparent);
+backdrop-filter:blur(18px)
+}
+.brand{display:flex;justify-content:space-between;align-items:center}
+.brandLeft{display:flex;align-items:center;gap:11px}
+.logo,.fallback{
+width:43px;height:43px;border-radius:13px;object-fit:cover;
+background:#12151c;border:1px solid #303540
+}
+.fallback{
+display:grid;place-items:center;color:var(--accent);
+font-size:20px;font-weight:900
+}
+.brand h1{margin:0;font-size:21px;letter-spacing:-.5px}
+.brand small{display:block;color:var(--muted);font-size:11px;margin-top:1px}
+.iconBtn{
+width:43px;height:43px;border-radius:14px;background:#13161e;
+border:1px solid var(--line);color:white;font-size:20px
 }
 
-body{overflow-x:hidden}
-button,input,select,textarea{font:inherit}
-button{border:0;color:inherit;cursor:pointer}
-
-button:active{
- transform:scale(.96);
-}
-
-.app{
- max-width:760px;
- margin:auto;
- min-height:100vh;
- padding-bottom:100px;
- animation:appIn .7s ease both;
-}
-
-@keyframes appIn{
- from{opacity:0}
- to{opacity:1}
-}
-
-header{
- padding:22px 18px 10px;
- position:sticky;
- top:0;
- z-index:20;
- background:linear-gradient(var(--bg) 72%,transparent);
- backdrop-filter:blur(8px);
-}
-
-.topbar{
- display:flex;
- align-items:center;
- justify-content:space-between;
-}
-
-.brand{
- display:flex;
- align-items:center;
- gap:11px;
- animation:brandIn .7s cubic-bezier(.2,.8,.2,1) both;
-}
-
-@keyframes brandIn{
- from{opacity:0;transform:translateY(-14px)}
- to{opacity:1;transform:none}
-}
-
-.brand img{
- width:43px;
- height:43px;
- border-radius:13px;
- object-fit:cover;
- box-shadow:0 7px 25px rgba(0,0,0,.4);
- transition:.3s;
-}
-
-.brand img:hover{
- transform:rotate(-4deg) scale(1.04);
-}
-
-.brand h1{
- font-size:22px;
- margin:0;
- font-weight:850;
- letter-spacing:-.6px;
-}
-
-.brand small{
- display:block;
- color:var(--muted);
- font-size:11px;
- margin-top:1px;
-}
-
-.iconbtn{
- width:43px;
- height:43px;
- border-radius:14px;
- background:var(--card);
- border:1px solid var(--line);
- display:grid;
- place-items:center;
- font-size:19px;
- transition:.25s;
- animation:fadeDown .6s .1s both;
-}
-
-.iconbtn:hover{
- border-color:rgba(53,211,154,.3);
- color:var(--green);
- transform:translateY(-2px);
-}
-
-@keyframes fadeDown{
- from{opacity:0;transform:translateY(-10px)}
- to{opacity:1;transform:none}
-}
-
-.page{
- display:none;
- padding:12px 16px;
-}
-
-.page.active{
- display:block;
- animation:pageIn .42s cubic-bezier(.2,.8,.2,1) both;
-}
-
+.page{display:none;padding:7px 16px}
+.page.active{display:block;animation:pageIn .3s ease}
 @keyframes pageIn{
- from{opacity:0;transform:translateY(13px)}
- to{opacity:1;transform:none}
+from{opacity:0;transform:translateY(9px)}
+to{opacity:1;transform:none}
 }
 
 .hero{
- position:relative;
- overflow:hidden;
- border:1px solid var(--line);
- border-radius:28px;
- padding:24px;
- background:linear-gradient(145deg,#131b23,#0b0f15);
- box-shadow:var(--shadow);
- margin-bottom:16px;
- animation:heroIn .65s cubic-bezier(.2,.8,.2,1) both;
+margin-top:7px;padding:24px;border:1px solid var(--line);border-radius:26px;
+background:radial-gradient(circle at 100% 0,rgba(185,255,88,.13),transparent 38%),
+linear-gradient(145deg,#151922,#0d0f15);
+box-shadow:0 20px 55px rgba(0,0,0,.35);position:relative;overflow:hidden
 }
-
-@keyframes heroIn{
- from{opacity:0;transform:translateY(18px) scale(.98)}
- to{opacity:1;transform:none}
-}
-
-.hero:before{
- content:"";
- position:absolute;
- width:240px;
- height:240px;
- border-radius:50%;
- right:-110px;
- top:-110px;
- background:rgba(53,211,154,.11);
- filter:blur(5px);
- animation:orb 6s ease-in-out infinite;
-}
-
-@keyframes orb{
- 0%,100%{transform:scale(1) translate(0,0)}
- 50%{transform:scale(1.12) translate(-8px,10px)}
-}
-
 .hero:after{
- content:"";
- position:absolute;
- width:100px;
- height:100px;
- border-radius:50%;
- left:-60px;
- bottom:-65px;
- background:rgba(97,168,255,.05);
- animation:orb2 7s ease-in-out infinite;
+content:"";position:absolute;width:160px;height:160px;border-radius:50%;
+right:-85px;bottom:-85px;background:rgba(185,255,88,.07)
 }
-
-@keyframes orb2{
- 50%{transform:translate(25px,-12px)}
-}
-
 .eyebrow{
- color:var(--muted);
- font-size:12px;
- font-weight:700;
- text-transform:uppercase;
- letter-spacing:1px;
+font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted)
 }
-
 .balance{
- font-size:40px;
- font-weight:850;
- letter-spacing:-1.8px;
- margin:8px 0 17px;
- position:relative;
- z-index:1;
- animation:balanceIn .8s .1s cubic-bezier(.2,.8,.2,1) both;
+font-size:43px;font-weight:900;letter-spacing:-2px;margin:7px 0 18px
 }
-
-@keyframes balanceIn{
- from{opacity:0;transform:translateY(12px);filter:blur(5px)}
- to{opacity:1;transform:none;filter:none}
+.currency{
+font-size:19px;color:var(--muted);vertical-align:11px;margin-right:2px
 }
-
-.balance.hidden{
- filter:blur(9px);
- user-select:none;
-}
-
-.hero-actions{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:10px;
- position:relative;
- z-index:2;
-}
-
+.heroActions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .btn{
- padding:13px 15px;
- border-radius:15px;
- background:#19212b;
- border:1px solid var(--line);
- font-weight:750;
- transition:transform .18s,box-shadow .25s,border-color .25s;
+min-height:48px;padding:0 15px;border-radius:15px;background:#1a1e27;
+border:1px solid #2b303b;color:var(--text);font-weight:800
 }
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#101309}
+.btn.danger{color:var(--red)}
 
-.btn:hover{
- transform:translateY(-2px);
- border-color:rgba(255,255,255,.14);
- box-shadow:0 8px 22px rgba(0,0,0,.2);
-}
-
-.btn.primary{
- background:var(--green);
- color:#03150f;
- box-shadow:0 7px 22px rgba(53,211,154,.12);
-}
-
-.btn.primary:hover{
- box-shadow:0 10px 28px rgba(53,211,154,.22);
-}
-
-.btn.danger{
- background:rgba(255,95,109,.12);
- color:#ff8490;
-}
-
-.btn.blue{
- background:rgba(97,168,255,.12);
- color:#8ec3ff;
-}
-
-.section-title{
- display:flex;
- justify-content:space-between;
- align-items:center;
- margin:22px 3px 10px;
- animation:sectionIn .5s both;
-}
-
-@keyframes sectionIn{
- from{opacity:0;transform:translateX(-8px)}
- to{opacity:1;transform:none}
-}
-
-.section-title h2{
- font-size:16px;
- margin:0;
-}
-
-.section-title button{
- background:none;
- color:var(--green);
- font-size:12px;
- font-weight:700;
- transition:.2s;
-}
-
-.section-title button:hover{
- transform:translateX(2px);
-}
-
-.grid2{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:11px;
-}
-
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .card{
- background:var(--card);
- border:1px solid var(--line);
- border-radius:var(--radius);
- padding:17px;
- transition:transform .25s,border-color .25s,box-shadow .25s;
- animation:cardIn .55s cubic-bezier(.2,.8,.2,1) both;
+background:var(--panel);border:1px solid var(--line);border-radius:19px;
+padding:16px;box-shadow:0 8px 28px rgba(0,0,0,.15)
 }
-
-.card:hover{
- transform:translateY(-2px);
- border-color:rgba(255,255,255,.12);
- box-shadow:0 12px 30px rgba(0,0,0,.2);
-}
-
-@keyframes cardIn{
- from{opacity:0;transform:translateY(12px)}
- to{opacity:1;transform:none}
-}
-
-.stat-value{
- font-size:22px;
- font-weight:800;
- margin-top:7px;
-}
-
-.stat-label{
- font-size:12px;
- color:var(--muted);
-}
-
+.statLabel{font-size:11px;color:var(--muted)}
+.statValue{font-size:21px;font-weight:850;margin-top:7px}
 .green{color:var(--green)}
 .red{color:var(--red)}
-.yellow{color:var(--yellow)}
 .blue{color:var(--blue)}
 
-.progress{
- height:8px;
- background:#202832;
- border-radius:99px;
- overflow:hidden;
- margin-top:12px;
+.sectionTitle{
+display:flex;align-items:center;justify-content:space-between;margin:24px 2px 11px
+}
+.sectionTitle h2{font-size:15px;margin:0}
+.sectionTitle span{font-size:11px;color:var(--muted)}
+.smallBtn{
+padding:7px 10px;border-radius:10px;background:#191c24;
+border:1px solid #2b303b;color:var(--text);font-size:11px;font-weight:700
 }
 
-.progress span{
- display:block;
- height:100%;
- background:linear-gradient(90deg,var(--green2),var(--green));
- border-radius:99px;
- transform-origin:left;
- animation:progressIn 1s cubic-bezier(.2,.8,.2,1) both;
+.transaction{
+display:flex;align-items:center;gap:11px;padding:13px 2px;
+border-bottom:1px solid #20242d
 }
-
-@keyframes progressIn{
- from{transform:scaleX(0)}
- to{transform:scaleX(1)}
+.txIcon{
+width:42px;height:42px;flex:none;border-radius:14px;background:#171a22;
+display:grid;place-items:center;font-size:18px
 }
-
-.quick-grid{
- display:grid;
- grid-template-columns:repeat(4,1fr);
- gap:9px;
+.txMain{flex:1;min-width:0}
+.txName{
+font-size:13px;font-weight:750;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap
 }
-
-.quick{
- background:var(--card);
- border:1px solid var(--line);
- border-radius:17px;
- padding:14px 7px;
- text-align:center;
- transition:.25s;
- animation:quickIn .55s cubic-bezier(.2,.8,.2,1) both;
-}
-
-.quick:nth-child(1){animation-delay:.05s}
-.quick:nth-child(2){animation-delay:.1s}
-.quick:nth-child(3){animation-delay:.15s}
-.quick:nth-child(4){animation-delay:.2s}
-
-@keyframes quickIn{
- from{opacity:0;transform:translateY(15px) scale(.94)}
- to{opacity:1;transform:none}
-}
-
-.quick:hover{
- transform:translateY(-4px);
- border-color:rgba(53,211,154,.22);
- box-shadow:0 10px 25px rgba(0,0,0,.2);
-}
-
-.quick .qicon{
- font-size:21px;
- margin-bottom:6px;
- transition:.25s;
-}
-
-.quick:hover .qicon{
- transform:translateY(-2px) scale(1.1);
-}
-
-.quick span{
- font-size:10px;
- color:var(--muted);
-}
-
-.txn{
- display:flex;
- align-items:center;
- gap:12px;
- padding:14px 3px;
- border-bottom:1px solid var(--line);
- animation:txnIn .45s cubic-bezier(.2,.8,.2,1) both;
-}
-
-.txn:nth-child(1){animation-delay:.02s}
-.txn:nth-child(2){animation-delay:.05s}
-.txn:nth-child(3){animation-delay:.08s}
-.txn:nth-child(4){animation-delay:.11s}
-.txn:nth-child(5){animation-delay:.14s}
-.txn:nth-child(6){animation-delay:.17s}
-
-@keyframes txnIn{
- from{opacity:0;transform:translateX(-12px)}
- to{opacity:1;transform:none}
-}
-
-.txn:last-child{border-bottom:0}
-
-.txn-icon{
- width:43px;
- height:43px;
- border-radius:14px;
- background:var(--card2);
- display:grid;
- place-items:center;
- font-size:19px;
- flex:none;
- transition:.25s;
-}
-
-.txn:hover .txn-icon{
- transform:scale(1.07) rotate(-3deg);
-}
-
-.txn-main{
- min-width:0;
- flex:1;
-}
-
-.txn-name{
- font-weight:700;
- font-size:14px;
- white-space:nowrap;
- overflow:hidden;
- text-overflow:ellipsis;
-}
-
-.txn-meta{
- font-size:11px;
- color:var(--muted);
- margin-top:3px;
-}
-
-.txn-amount{
- font-weight:800;
- font-size:14px;
- white-space:nowrap;
-}
-
+.txMeta{font-size:10px;color:var(--muted);margin-top:3px}
+.txAmount{font-size:13px;font-weight:850}
 .empty{
- text-align:center;
- color:var(--muted);
- padding:35px 15px;
- font-size:13px;
- animation:fadeIn .5s both;
+padding:30px 15px;text-align:center;color:var(--muted);
+border:1px dashed #2b303a;border-radius:18px;font-size:12px
 }
 
-@keyframes fadeIn{
- from{opacity:0}
- to{opacity:1}
+.formCard{
+background:var(--panel);border:1px solid var(--line);
+border-radius:22px;padding:18px
 }
-
-.goal{
- margin-bottom:12px;
-}
-
-.goal:last-child{
- margin-bottom:0;
-}
-
-.goal-head{
- display:flex;
- justify-content:space-between;
- font-size:13px;
- font-weight:700;
-}
-
-.goal-meta{
- display:flex;
- justify-content:space-between;
- color:var(--muted);
- font-size:11px;
- margin-top:6px;
-}
-
-.goal-actions{
- display:flex;
- gap:7px;
- margin-top:10px;
-}
-
-.goal-actions button{
- padding:8px 10px;
- border-radius:10px;
- background:#1b232e;
- font-size:11px;
- transition:.2s;
-}
-
-.goal-actions button:hover{
- background:#232d39;
- transform:translateY(-1px);
-}
-
-.bottomnav{
- position:fixed;
- bottom:0;
- left:50%;
- transform:translateX(-50%);
- width:min(760px,100%);
- background:rgba(9,12,17,.92);
- backdrop-filter:blur(20px);
- border-top:1px solid var(--line);
- display:grid;
- grid-template-columns:repeat(5,1fr);
- padding:9px 8px calc(9px + env(safe-area-inset-bottom));
- z-index:50;
-}
-
-.navbtn{
- background:none;
- color:#6f7987;
- font-size:10px;
- font-weight:700;
- padding:6px 2px;
- border-radius:14px;
- transition:.25s;
-}
-
-.navbtn:hover{
- color:#aeb7c4;
-}
-
-.navbtn.active{
- color:var(--green);
- background:rgba(53,211,154,.08);
- animation:navActive .35s ease both;
-}
-
-@keyframes navActive{
- from{transform:scale(.94)}
- to{transform:scale(1)}
-}
-
-.navicon{
- font-size:19px;
- display:block;
- margin-bottom:3px;
- transition:.25s;
-}
-
-.navbtn.active .navicon{
- transform:translateY(-1px) scale(1.08);
-}
-
-.list-card{
- background:var(--card);
- border:1px solid var(--line);
- border-radius:var(--radius);
- padding:4px 16px;
-}
-
-.toolbar{
- display:flex;
- gap:8px;
- margin-bottom:12px;
-}
-
-.search{
- flex:1;
- background:var(--card);
- border:1px solid var(--line);
- border-radius:14px;
- color:var(--text);
- padding:12px 14px;
- outline:none;
- transition:.25s;
-}
-
-.search:focus,
-.input:focus,
-select:focus{
- border-color:rgba(53,211,154,.45);
- box-shadow:0 0 0 3px rgba(53,211,154,.07);
-}
-
-select,.input{
- width:100%;
- background:#0d131b;
- border:1px solid var(--line);
- border-radius:14px;
- padding:13px;
- color:var(--text);
- outline:none;
- transition:.25s;
-}
-
 label{
- display:block;
- color:var(--muted);
- font-size:11px;
- font-weight:700;
- margin:13px 0 6px;
+display:block;color:var(--muted);font-size:11px;margin:13px 0 7px
 }
-
-textarea.input{
- resize:vertical;
- min-height:75px;
+input,select{
+width:100%;height:48px;border-radius:14px;background:#0b0d12;
+border:1px solid #2b303b;color:var(--text);padding:0 13px;outline:none
 }
+input:focus,select:focus{border-color:var(--accent)}
+.formRow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-.filters{
- display:flex;
- gap:7px;
- overflow:auto;
- padding-bottom:3px;
- margin-bottom:12px;
- scrollbar-width:none;
+.progress{
+height:7px;background:#252a34;border-radius:20px;
+overflow:hidden;margin-top:9px
 }
-
-.filters::-webkit-scrollbar{display:none}
-
-.filter{
- white-space:nowrap;
- padding:8px 12px;
- background:var(--card);
- border:1px solid var(--line);
- border-radius:12px;
- color:var(--muted);
- font-size:11px;
- transition:.2s;
+.progress i{
+display:block;height:100%;background:var(--accent);border-radius:20px
 }
-
-.filter:hover{
- color:#c4ccd7;
+.goal{margin-bottom:10px}
+.goalTop{display:flex;justify-content:space-between;font-size:13px}
+.goalBottom{
+display:flex;justify-content:space-between;color:var(--muted);
+font-size:10px;margin-top:8px
 }
+.goalActions{display:flex;gap:6px;justify-content:flex-end;margin-top:10px}
 
-.filter.active{
- color:var(--green);
- border-color:rgba(53,211,154,.35);
- background:rgba(53,211,154,.08);
+.bottom{
+position:fixed;z-index:30;left:50%;bottom:0;transform:translateX(-50%);
+width:min(700px,100%);padding:9px 11px calc(9px + env(safe-area-inset-bottom));
+background:rgba(10,11,15,.94);backdrop-filter:blur(20px);
+border-top:1px solid #20242d;display:grid;grid-template-columns:repeat(5,1fr);gap:4px
 }
-
-.chart{
- height:190px;
- display:flex;
- align-items:end;
- gap:6px;
- padding:15px 5px 5px;
+.nav{
+background:transparent;border:0;color:#747b89;border-radius:13px;
+padding:6px 2px;font-size:10px;font-weight:750
 }
-
-.barwrap{
- height:100%;
- flex:1;
- display:flex;
- align-items:end;
- justify-content:center;
- position:relative;
-}
-
-.bar{
- width:70%;
- max-width:25px;
- background:linear-gradient(var(--green),#126e51);
- border-radius:7px 7px 3px 3px;
- min-height:3px;
- transform-origin:bottom;
- animation:barIn .8s cubic-bezier(.2,.8,.2,1) both;
-}
-
-@keyframes barIn{
- from{transform:scaleY(0)}
- to{transform:scaleY(1)}
-}
-
-.barlabel{
- position:absolute;
- bottom:-15px;
- font-size:8px;
- color:var(--muted);
-}
-
-.calc-display{
- background:#090d12;
- border:1px solid var(--line);
- border-radius:22px;
- padding:17px;
- text-align:right;
- min-height:130px;
- display:flex;
- flex-direction:column;
- justify-content:flex-end;
- margin-bottom:11px;
- overflow:hidden;
-}
-
-.calc-expression{
- font-size:14px;
- color:var(--muted);
- min-height:22px;
- word-break:break-all;
-}
-
-.calc-result{
- font-size:37px;
- font-weight:800;
- letter-spacing:-1px;
- overflow:hidden;
- text-overflow:ellipsis;
- animation:calcResult .25s ease both;
-}
-
-@keyframes calcResult{
- from{opacity:.4;transform:translateY(4px)}
- to{opacity:1;transform:none}
-}
-
-.calc-memory{
- font-size:10px;
- color:var(--green);
- height:14px;
-}
-
-.calc-memory-row,.calc-row{
- display:grid;
- grid-template-columns:repeat(4,1fr);
- gap:7px;
- margin-bottom:7px;
-}
-
-.calc-btn{
- height:57px;
- border-radius:16px;
- background:#151c25;
- border:1px solid var(--line);
- font-size:18px;
- font-weight:700;
- transition:transform .12s,background .2s,border-color .2s;
-}
-
-.calc-btn:hover{
- background:#1b2430;
- border-color:rgba(255,255,255,.13);
-}
-
-.calc-btn:active{
- transform:scale(.91);
-}
-
-.calc-btn.op{
- color:var(--green);
- background:#101c19;
-}
-
-.calc-btn.equal{
- background:var(--green);
- color:#03150f;
-}
-
-.calc-btn.equal:hover{
- background:#42dda4;
-}
-
-.calc-btn.special{
- color:var(--blue);
- font-size:13px;
-}
-
-.fin-grid{
- display:grid;
- grid-template-columns:repeat(2,1fr);
- gap:9px;
-}
-
-.fin-card{
- background:var(--card);
- border:1px solid var(--line);
- border-radius:18px;
- padding:15px;
- text-align:left;
- transition:.25s;
- animation:cardIn .5s both;
-}
-
-.fin-card:hover{
- transform:translateY(-3px);
- border-color:rgba(97,168,255,.2);
- box-shadow:0 10px 25px rgba(0,0,0,.2);
-}
-
-.fin-card h4{
- margin:0 0 4px;
- font-size:14px;
-}
-
-.fin-card p{
- margin:0;
- color:var(--muted);
- font-size:11px;
-}
-
-.settings-row{
- display:flex;
- align-items:center;
- justify-content:space-between;
- gap:15px;
- padding:16px 2px;
- border-bottom:1px solid var(--line);
-}
-
-.settings-row:last-child{
- border-bottom:0;
-}
-
-.settings-title{
- font-weight:700;
- font-size:14px;
-}
-
-.settings-sub{
- font-size:11px;
- color:var(--muted);
- margin-top:3px;
-}
-
-.switch{
- width:48px;
- height:27px;
- border-radius:99px;
- background:#27303b;
- padding:3px;
- transition:.25s;
-}
-
-.switch span{
- display:block;
- width:21px;
- height:21px;
- background:#fff;
- border-radius:50%;
- transition:.25s cubic-bezier(.2,.8,.2,1);
-}
-
-.switch.on{
- background:var(--green);
-}
-
-.switch.on span{
- transform:translateX(21px);
-}
+.nav span{display:block;font-size:19px;margin-bottom:2px}
+.nav.active{background:#171b22;color:var(--accent)}
 
 .modal{
- position:fixed;
- inset:0;
- background:rgba(0,0,0,.7);
- backdrop-filter:blur(10px);
- display:none;
- align-items:flex-end;
- z-index:100;
- padding:12px;
+display:none;position:fixed;z-index:60;inset:0;background:rgba(0,0,0,.68);
+backdrop-filter:blur(8px);align-items:flex-end;justify-content:center
 }
-
-.modal.show{
- display:flex;
- animation:modalBg .25s ease both;
-}
-
-@keyframes modalBg{
- from{opacity:0}
- to{opacity:1}
-}
-
+.modal.show{display:flex;animation:fade .2s}
 .sheet{
- width:min(600px,100%);
- margin:auto;
- background:#111720;
- border:1px solid var(--line);
- border-radius:27px;
- padding:20px;
- max-height:92vh;
- overflow:auto;
- animation:sheetIn .4s cubic-bezier(.2,.8,.2,1) both;
+width:min(700px,100%);max-height:93vh;overflow:auto;background:#11141b;
+border:1px solid #2a2f39;border-radius:27px 27px 0 0;
+padding:20px 17px calc(25px + env(safe-area-inset-bottom));
+animation:sheetIn .3s ease
 }
-
 @keyframes sheetIn{
- from{opacity:0;transform:translateY(35px) scale(.97)}
- to{opacity:1;transform:none}
+from{transform:translateY(100%)}to{transform:none}
 }
-
-.sheet-head{
- display:flex;
- justify-content:space-between;
- align-items:center;
- margin-bottom:7px;
+@keyframes fade{
+from{opacity:0}to{opacity:1}
 }
-
-.sheet h3{
- margin:0;
- font-size:19px;
+.sheetHead{
+display:flex;justify-content:space-between;align-items:center;margin-bottom:8px
 }
-
+.sheetHead h2{font-size:20px;margin:0}
 .close{
- width:35px;
- height:35px;
- border-radius:12px;
- background:#1b232d;
- transition:.2s;
+width:38px;height:38px;border-radius:12px;background:#1b1e26;
+border:0;color:white;font-size:22px
 }
 
-.close:hover{
- background:#26303c;
- transform:rotate(90deg);
+.cashSummary{
+display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0
 }
+.cashStat{
+background:#171a21;border:1px solid #292e38;border-radius:16px;padding:14px
+}
+.cashStat b{display:block;font-size:18px;margin-top:5px}
+.cashSection{
+margin-top:16px;background:#0e1117;border:1px solid #252a34;
+border-radius:19px;overflow:hidden
+}
+.cashHeader{
+display:flex;justify-content:space-between;align-items:center;
+padding:13px 14px;background:#151820;border-bottom:1px solid #252a34
+}
+.cashHeader b{font-size:13px}
+.cashHeader span{font-size:10px;color:var(--muted)}
+.moneyRow{
+display:grid;grid-template-columns:55px 1fr 80px 72px;
+align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #1c2029
+}
+.moneyRow:last-child{border-bottom:0}
+.denom{font-size:13px;font-weight:850}
+.countInput{height:40px;text-align:center;padding:0}
+.rowTotal{text-align:right;font-size:12px;font-weight:750}
+.present{
+width:13px;height:13px;border-radius:50%;display:inline-block;
+margin-right:5px;background:#303540;vertical-align:-2px
+}
+.present.yes{
+background:var(--accent);
+box-shadow:0 0 10px rgba(185,255,88,.25)
+}
+.cashTotal{
+margin-top:12px;padding:16px;border-radius:17px;
+background:linear-gradient(145deg,#1a2016,#151820);
+display:flex;justify-content:space-between;align-items:center
+}
+.cashTotal b{font-size:20px;color:var(--accent)}
+.cashActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 
-.form-grid{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:9px;
+.calcDisplay{
+background:#090b10;border:1px solid #292e38;border-radius:19px;
+padding:15px;text-align:right;min-height:82px;margin-bottom:10px
 }
+.calcExpr{font-size:12px;color:var(--muted);height:20px;overflow:hidden}
+.calcResult{
+font-size:31px;font-weight:850;overflow:hidden;text-overflow:ellipsis
+}
+.calcGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.calcKey{
+height:57px;border-radius:15px;background:#191c24;
+border:1px solid #292e38;color:white;font-size:18px;font-weight:750
+}
+.calcKey.op{color:var(--accent);background:#171d16}
+.calcKey.equal{background:var(--accent);color:#101309}
+.calcKey.wide{grid-column:span 2}
 
-.full{
- grid-column:1/-1;
+.setting{
+display:flex;align-items:center;justify-content:space-between;
+padding:15px 2px;border-bottom:1px solid #222631
 }
-
-.actions{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:9px;
- margin-top:17px;
+.setting b{font-size:13px}
+.setting span{
+display:block;font-size:10px;color:var(--muted);margin-top:3px
 }
-
-.confirm-icon{
- text-align:center;
- font-size:36px;
- margin:6px;
- animation:iconPop .4s cubic-bezier(.2,.8,.2,1) both;
+.toggle{
+width:49px;height:29px;border-radius:20px;background:#30343e;
+border:0;padding:3px
 }
-
-@keyframes iconPop{
- from{opacity:0;transform:scale(.5) rotate(-15deg)}
- to{opacity:1;transform:none}
+.toggle i{
+display:block;width:23px;height:23px;border-radius:50%;
+background:#fff;transition:.2s
 }
-
-.confirm-text{
- text-align:center;
- color:var(--muted);
- font-size:13px;
- line-height:1.5;
-}
+.toggle.on{background:var(--accent)}
+.toggle.on i{transform:translateX(20px);background:#101309}
 
 .toast{
- position:fixed;
- left:50%;
- bottom:92px;
- transform:translate(-50%,25px) scale(.96);
- background:#e9eef3;
- color:#07100d;
- padding:11px 15px;
- border-radius:13px;
- font-size:12px;
- font-weight:750;
- opacity:0;
- pointer-events:none;
- transition:.3s cubic-bezier(.2,.8,.2,1);
- z-index:200;
- white-space:nowrap;
- box-shadow:var(--shadow);
+position:fixed;z-index:100;left:50%;bottom:88px;
+transform:translate(-50%,20px);opacity:0;pointer-events:none;
+background:#f4f5f7;color:#101217;padding:11px 15px;border-radius:13px;
+font-size:11px;font-weight:800;transition:.25s;white-space:nowrap
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* =========================================================
+   VAULT
+   ========================================================= */
+
+#vaultLock{
+position:fixed;
+inset:0;
+z-index:9999;
+display:none;
+background:
+radial-gradient(circle at center,#263238 0%,#111619 45%,#050607 100%);
+align-items:center;
+justify-content:center;
+overflow:hidden;
+}
+#vaultLock.show{display:flex}
+
+.vaultScreen{
+width:min(430px,100%);
+min-height:100%;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+padding:25px 20px;
+text-align:center;
 }
 
-.toast.show{
- opacity:1;
- transform:translate(-50%,0) scale(1);
+.vaultTitle{
+font-size:12px;
+letter-spacing:3px;
+text-transform:uppercase;
+color:#8f9ba1;
+margin-bottom:7px;
 }
 
-#financialResult .card{
- animation:resultIn .4s cubic-bezier(.2,.8,.2,1) both;
+.vaultHeading{
+font-size:27px;
+font-weight:900;
+margin:0 0 5px;
 }
 
-@keyframes resultIn{
- from{opacity:0;transform:translateY(8px) scale(.98)}
- to{opacity:1;transform:none}
+.vaultSub{
+color:#8f9ba1;
+font-size:11px;
+margin-bottom:17px;
+}
+
+/* CURRENT NUMBER IS OUTSIDE THE WHEEL.
+   NOTHING IS WRITTEN/ENGRAVED ON THE ROTATABLE WHEEL. */
+
+.liveNumber{
+width:74px;
+height:42px;
+display:grid;
+place-items:center;
+border-radius:12px;
+background:#0b0d11;
+border:1px solid #343a43;
+font-size:22px;
+font-weight:900;
+color:#f4f5f7;
+margin-bottom:12px;
+transition:.2s;
+}
+
+.liveNumber.correct{
+color:var(--green);
+border-color:var(--green);
+box-shadow:0 0 18px rgba(125,255,178,.16);
+}
+
+.liveNumber.wrong{
+color:var(--red);
+border-color:var(--red);
+box-shadow:0 0 18px rgba(255,113,133,.16);
+}
+
+.lockAssembly{
+width:310px;
+height:310px;
+max-width:82vw;
+max-height:82vw;
+position:relative;
+margin:auto;
+user-select:none;
+touch-action:none;
+}
+
+.lockOuter{
+position:absolute;
+inset:0;
+border-radius:50%;
+background:
+radial-gradient(circle,#343c41 0%,#1a2024 59%,#0c1013 60%,
+#31393e 67%,#111518 74%,#050708 100%);
+border:8px solid #454e53;
+box-shadow:
+inset 0 0 25px rgba(0,0,0,.9),
+inset 0 0 4px rgba(255,255,255,.3),
+0 18px 45px rgba(0,0,0,.65);
+}
+
+.wheel{
+position:absolute;
+width:218px;
+height:218px;
+left:50%;
+top:50%;
+margin-left:-109px;
+margin-top:-109px;
+border-radius:50%;
+background:
+radial-gradient(circle at 35% 30%,#717c82 0%,#3c464b 28%,
+#20272b 58%,#0e1215 100%);
+border:6px solid #59646a;
+box-shadow:
+inset 0 0 28px rgba(0,0,0,.9),
+inset 0 3px 5px rgba(255,255,255,.15),
+0 7px 20px rgba(0,0,0,.7);
+touch-action:none;
+user-select:none;
+cursor:grab;
+will-change:transform;
+}
+
+.wheel:active{cursor:grabbing}
+
+.wheelCenter{
+position:absolute;
+left:50%;
+top:50%;
+width:76px;
+height:76px;
+margin-left:-38px;
+margin-top:-38px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:radial-gradient(circle,#3d474c,#111518);
+border:5px solid #69747a;
+box-shadow:inset 0 0 17px #000,0 2px 8px rgba(0,0,0,.6);
+font-size:25px;
+pointer-events:none;
+z-index:5;
+}
+
+.lockPointer{
+position:absolute;
+z-index:20;
+left:50%;
+top:-2px;
+transform:translateX(-50%);
+width:0;
+height:0;
+border-left:10px solid transparent;
+border-right:10px solid transparent;
+border-top:24px solid var(--accent);
+filter:drop-shadow(0 2px 3px #000);
+}
+
+.wheelInstruction{
+margin-top:18px;
+color:#8d999f;
+font-size:11px;
+letter-spacing:1px;
+}
+
+.vaultButtons{
+width:100%;
+max-width:310px;
+display:grid;
+grid-template-columns:1fr;
+gap:8px;
+margin-top:18px;
+}
+
+.vaultBtn{
+height:48px;
+border-radius:14px;
+background:#151820;
+border:1px solid #2b3039;
+color:white;
+font-size:12px;
+font-weight:800;
+}
+
+.vaultBtn.primary{
+background:var(--accent);
+color:#101309;
+border-color:var(--accent);
+}
+
+.lockStatus{
+min-height:18px;
+margin-top:13px;
+color:#747b89;
+font-size:11px;
+text-align:center;
+}
+
+.lockStatus.error{
+color:var(--red);
+animation:shake .28s ease;
+}
+
+.lockStatus.success{color:var(--green)}
+
+@keyframes shake{
+0%,100%{transform:translateX(0)}
+25%{transform:translateX(-6px)}
+75%{transform:translateX(6px)}
+}
+
+/* =========================================================
+   VAULT SETUP
+   ========================================================= */
+
+.setupVault{
+display:flex;
+flex-direction:column;
+align-items:center;
+text-align:center;
+}
+
+.setupLiveNumber{
+font-size:20px;
+font-weight:900;
+color:var(--accent);
+margin:10px 0;
+}
+
+.setupLockAssembly{
+width:250px;
+height:250px;
+position:relative;
+margin:8px auto 15px;
+user-select:none;
+touch-action:none;
+}
+
+.setupLockAssembly .lockOuter{
+border-width:7px;
+}
+
+.setupWheel{
+position:absolute;
+width:176px;
+height:176px;
+left:50%;
+top:50%;
+margin-left:-88px;
+margin-top:-88px;
+border-radius:50%;
+background:
+radial-gradient(circle at 35% 30%,#717c82 0%,#3c464b 28%,
+#20272b 58%,#0e1215 100%);
+border:5px solid #59646a;
+box-shadow:
+inset 0 0 25px rgba(0,0,0,.9),
+0 7px 20px rgba(0,0,0,.7);
+touch-action:none;
+cursor:grab;
+}
+
+.setupWheel:active{cursor:grabbing}
+
+.setupWheel .wheelCenter{
+width:58px;
+height:58px;
+margin-left:-29px;
+margin-top:-29px;
+font-size:19px;
+border-width:4px;
+}
+
+.setupPointer{
+position:absolute;
+z-index:20;
+left:50%;
+top:-3px;
+transform:translateX(-50%);
+width:0;
+height:0;
+border-left:8px solid transparent;
+border-right:8px solid transparent;
+border-top:20px solid var(--accent);
+}
+
+.sequenceDots{
+display:flex;
+justify-content:center;
+gap:7px;
+min-height:28px;
+margin:8px 0 4px;
+}
+
+.sequenceDot{
+width:10px;
+height:10px;
+border-radius:50%;
+background:#303540;
+border:1px solid #454b55;
+}
+
+.sequenceDot.filled{
+background:var(--accent);
+box-shadow:0 0 10px rgba(185,255,88,.3);
+}
+
+.setupHint{
+font-size:10px;
+line-height:1.5;
+color:var(--muted);
+max-width:290px;
+margin:5px auto 12px;
 }
 
 @media(max-width:420px){
- .balance{font-size:34px}
- .quick-grid{grid-template-columns:repeat(4,1fr)}
- .quick{padding:12px 4px}
- .calc-btn{height:53px}
- .sheet{border-radius:24px}
+.moneyRow{
+grid-template-columns:50px 1fr 66px 65px;
+gap:5px;padding:9px 8px
+}
+.lockAssembly{transform:scale(.92)}
 }
 
-@media(prefers-reduced-motion:reduce){
- *,*::before,*::after{
-  animation-duration:.01ms!important;
-  animation-iteration-count:1!important;
-  transition-duration:.01ms!important;
-  scroll-behavior:auto!important;
- }
+@media(min-width:600px){
+.bottom{
+bottom:15px;border:1px solid #262b35;border-radius:20px;
+width:min(670px,calc(100% - 30px))
+}
+.app{padding-bottom:110px}
+#vaultLock{padding:15px}
+.vaultScreen{min-height:calc(100vh - 30px)}
 }
 </style>
 </head>
 
 <body>
 
+<!-- =========================================================
+     VAULT LOCK
+     ========================================================= -->
+
+<div id="vaultLock">
+<div class="vaultScreen">
+
+<div class="vaultTitle">POCKI SECURITY</div>
+<h1 class="vaultHeading">Vault Locked</h1>
+
+<div class="vaultSub">
+Rotate the wheel and release it when the pointer reaches your number.
+</div>
+
+<!-- LIVE NUMBER ONLY.
+     NO NUMBERS ARE PRINTED ON THE WHEEL. -->
+<div id="liveNumber" class="liveNumber">0</div>
+
+<div class="lockAssembly" id="lockAssembly">
+<div class="lockOuter"></div>
+<div class="lockPointer"></div>
+
+<div class="wheel" id="lockWheel">
+<div class="wheelCenter">🔒</div>
+</div>
+</div>
+
+<div class="wheelInstruction">
+LIVE NUMBER
+</div>
+
+<div class="vaultButtons">
+<button class="vaultBtn" onclick="vaultUndo()">UNDO LAST</button>
+</div>
+
+<div id="lockStatus" class="lockStatus">
+Drag the wheel with your finger.
+</div>
+
+<div id="vaultLight"
+style="
+width:18px;
+height:18px;
+border-radius:50%;
+margin-top:12px;
+background:#303540;
+box-shadow:0 0 0 transparent;
+transition:.2s">
+</div>
+
+</div>
+</div>
+
+
+<!-- =========================================================
+     MAIN APP
+     ========================================================= -->
+
 <div class="app">
 
-<header>
-<div class="topbar">
+<header class="top">
 <div class="brand">
-<img src="pocki-icon-520.png" onerror="this.style.display='none'">
+<div class="brandLeft">
+
+<img id="logo"
+class="logo"
+src="pocki-1080.png"
+onerror="this.style.display='none';document.getElementById('fallbackLogo').style.display='grid'">
+
+<div id="fallbackLogo" class="fallback" style="display:none">P</div>
+
 <div>
 <h1>Pocki</h1>
-<small>Your personal money space</small>
+<small>Personal money manager</small>
 </div>
+
 </div>
-<button class="iconbtn" id="privacyBtn" onclick="toggleBalance()">◉</button>
+
+<button class="iconBtn" onclick="openCashWallet()">▤</button>
+
 </div>
 </header>
 
 <main>
 
-<section class="page active" id="homePage">
+<!-- HOME -->
+
+<section id="home" class="page active">
 
 <div class="hero">
-<div class="eyebrow">Total balance</div>
-<div class="balance" id="balance">₹0.00</div>
 
-<div class="hero-actions">
+<div class="eyebrow">Total savings</div>
+
+<div class="balance">
+<span class="currency">₹</span>
+<span id="balance">0.00</span>
+</div>
+
+<div class="heroActions">
 <button class="btn primary" onclick="openTransaction('income')">＋ Add Money</button>
 <button class="btn" onclick="openTransaction('expense')">− Add Expense</button>
 </div>
+
 </div>
 
-<div class="quick-grid">
-<button class="quick" onclick="openTransaction('income')">
-<div class="qicon">💰</div><span>Income</span>
-</button>
+<div class="grid" style="margin-top:10px">
 
-<button class="quick" onclick="openTransaction('expense')">
-<div class="qicon">💸</div><span>Expense</span>
-</button>
-
-<button class="quick" onclick="openGoalModal()">
-<div class="qicon">🎯</div><span>Goal</span>
-</button>
-
-<button class="quick" onclick="showPage('calculator')">
-<div class="qicon">🧮</div><span>Calculator</span>
-</button>
-</div>
-
-<div class="section-title">
-<h2>Overview</h2>
-<button onclick="showPage('stats')">View stats</button>
-</div>
-
-<div class="grid2">
 <div class="card">
-<div class="stat-label">Total savings</div>
-<div class="stat-value green" id="homeSavings">₹0</div>
+<div class="statLabel">Money Added</div>
+<div id="incomeStat" class="statValue green">₹0</div>
 </div>
 
 <div class="card">
-<div class="stat-label">This month spent</div>
-<div class="stat-value red" id="homeSpent">₹0</div>
-</div>
-</div>
-
-<div class="section-title">
-<h2>Savings goals</h2>
-<button onclick="openGoalModal()">＋ Add</button>
+<div class="statLabel">Money Spent</div>
+<div id="expenseStat" class="statValue red">₹0</div>
 </div>
 
-<div class="card" id="homeGoals"></div>
-
-<div class="section-title">
-<h2>Recent activity</h2>
-<button onclick="showPage('transactions')">See all</button>
+<div class="card">
+<div class="statLabel">This Month</div>
+<div id="monthStat" class="statValue">₹0</div>
 </div>
 
-<div class="list-card" id="recentTransactions"></div>
+<div class="card">
+<div class="statLabel">Transactions</div>
+<div id="txCount" class="statValue blue">0</div>
+</div>
+
+</div>
+
+<div class="sectionTitle">
+<h2>Savings Goals</h2>
+<button class="smallBtn" onclick="openGoal()">＋ Goal</button>
+</div>
+
+<div id="goals"></div>
+
+<div class="sectionTitle">
+<h2>Recent Activity</h2>
+<button class="smallBtn" onclick="showPage('activity')">View all</button>
+</div>
+
+<div id="recent"></div>
 
 </section>
 
 
-<section class="page" id="transactionsPage">
+<!-- ACTIVITY -->
 
-<div class="section-title">
-<h2>Transactions</h2>
-<button onclick="openTransaction('income')">＋ Add</button>
+<section id="activity" class="page">
+
+<div class="sectionTitle">
+<h2>Activity</h2>
+<span id="activityCount">0 transactions</span>
 </div>
 
-<div class="toolbar">
-<input class="search" id="transactionSearch" placeholder="Search transactions..." oninput="renderTransactions()">
-</div>
+<input id="searchTx"
+placeholder="Search transactions..."
+oninput="renderActivity()">
 
-<div class="filters">
-<button class="filter active" onclick="setTxFilter('all',this)">All</button>
-<button class="filter" onclick="setTxFilter('income',this)">Money in</button>
-<button class="filter" onclick="setTxFilter('expense',this)">Money out</button>
-<button class="filter" onclick="setTxFilter('savings',this)">Savings</button>
-</div>
-
-<div class="list-card" id="allTransactions"></div>
+<div id="activityList"></div>
 
 </section>
 
 
-<section class="page" id="savingsPage">
+<!-- SAVINGS -->
 
-<div class="section-title">
+<section id="savings" class="page">
+
+<div class="sectionTitle">
 <h2>Savings</h2>
-<button onclick="openGoalModal()">＋ Goal</button>
+<button class="smallBtn" onclick="openGoal()">＋ New Goal</button>
 </div>
 
-<div class="hero">
-<div class="eyebrow">Money saved</div>
-<div class="balance" id="savingsTotal">₹0.00</div>
-<div class="stat-label">Track what you're building toward.</div>
+<div class="card" style="margin-bottom:12px">
+
+<div class="statLabel">Available balance</div>
+
+<div id="saveAvailable" class="statValue green">
+₹0
 </div>
 
-<div id="goalsList"></div>
-
-<div class="section-title">
-<h2>Savings tools</h2>
-</div>
-
-<div class="fin-grid">
-
-<button class="fin-card" onclick="openGoalModal()">
-<h4>🎯 New goal</h4>
-<p>Create a target and track progress.</p>
-</button>
-
-<button class="fin-card" onclick="openTransaction('savings')">
-<h4>🏦 Save money</h4>
-<p>Record money moved into savings.</p>
-</button>
-
-</div>
-</section>
-
-
-<section class="page" id="statsPage">
-
-<div class="section-title">
-<h2>Statistics</h2>
-</div>
-
-<div class="grid2">
-
-<div class="card">
-<div class="stat-label">Total money in</div>
-<div class="stat-value green" id="statIncome">₹0</div>
-</div>
-
-<div class="card">
-<div class="stat-label">Total spent</div>
-<div class="stat-value red" id="statExpense">₹0</div>
-</div>
-
-<div class="card">
-<div class="stat-label">Transactions</div>
-<div class="stat-value" id="statCount">0</div>
-</div>
-
-<div class="card">
-<div class="stat-label">Goals completed</div>
-<div class="stat-value yellow" id="statGoals">0</div>
+<div style="font-size:10px;color:var(--muted);margin-top:5px">
+Track multiple savings goals independently.
 </div>
 
 </div>
 
-<div class="section-title">
-<h2>Last 7 days</h2>
-</div>
-
-<div class="card">
-<div class="chart" id="chart"></div>
-</div>
-
-<div class="section-title">
-<h2>Expense categories</h2>
-</div>
-
-<div class="card" id="categoryStats"></div>
+<div id="allGoals"></div>
 
 </section>
 
 
-<section class="page" id="calculatorPage">
+<!-- CALCULATOR -->
 
-<div class="section-title">
+<section id="calculator" class="page">
+
+<div class="sectionTitle">
 <h2>Calculator</h2>
-<button onclick="clearCalcHistory()">Clear history</button>
+<button class="smallBtn" onclick="calcClear()">Clear</button>
 </div>
 
-<div class="calc-display">
-<div class="calc-memory" id="calcMemory"></div>
-<div class="calc-expression" id="calcExpression"></div>
-<div class="calc-result" id="calcResult">0</div>
+<div class="formCard">
+
+<div class="calcDisplay">
+<div id="calcExpr" class="calcExpr"></div>
+<div id="calcResult" class="calcResult">0</div>
 </div>
 
-<div class="calc-memory-row">
-<button class="calc-btn special" onclick="calcMemoryClear()">MC</button>
-<button class="calc-btn special" onclick="calcMemoryRecall()">MR</button>
-<button class="calc-btn special" onclick="calcMemoryAdd()">M+</button>
-<button class="calc-btn special" onclick="calcMemorySubtract()">M−</button>
-</div>
+<div class="calcGrid">
 
-<div class="calc-row">
-<button class="calc-btn special" onclick="calcClear()">AC</button>
-<button class="calc-btn special" onclick="calcBackspace()">⌫</button>
-<button class="calc-btn special" onclick="calcPercent()">%</button>
-<button class="calc-btn op" onclick="calcInput('÷')">÷</button>
-</div>
+<button class="calcKey" onclick="calcInput('AC')">AC</button>
+<button class="calcKey" onclick="calcInput('⌫')">⌫</button>
+<button class="calcKey op" onclick="calcInput('%')">%</button>
+<button class="calcKey op" onclick="calcInput('÷')">÷</button>
 
-<div class="calc-row">
-<button class="calc-btn" onclick="calcInput('7')">7</button>
-<button class="calc-btn" onclick="calcInput('8')">8</button>
-<button class="calc-btn" onclick="calcInput('9')">9</button>
-<button class="calc-btn op" onclick="calcInput('×')">×</button>
-</div>
+<button class="calcKey" onclick="calcInput('7')">7</button>
+<button class="calcKey" onclick="calcInput('8')">8</button>
+<button class="calcKey" onclick="calcInput('9')">9</button>
+<button class="calcKey op" onclick="calcInput('×')">×</button>
 
-<div class="calc-row">
-<button class="calc-btn" onclick="calcInput('4')">4</button>
-<button class="calc-btn" onclick="calcInput('5')">5</button>
-<button class="calc-btn" onclick="calcInput('6')">6</button>
-<button class="calc-btn op" onclick="calcInput('−')">−</button>
-</div>
+<button class="calcKey" onclick="calcInput('4')">4</button>
+<button class="calcKey" onclick="calcInput('5')">5</button>
+<button class="calcKey" onclick="calcInput('6')">6</button>
+<button class="calcKey op" onclick="calcInput('−')">−</button>
 
-<div class="calc-row">
-<button class="calc-btn" onclick="calcInput('1')">1</button>
-<button class="calc-btn" onclick="calcInput('2')">2</button>
-<button class="calc-btn" onclick="calcInput('3')">3</button>
-<button class="calc-btn op" onclick="calcInput('+')">+</button>
-</div>
+<button class="calcKey" onclick="calcInput('1')">1</button>
+<button class="calcKey" onclick="calcInput('2')">2</button>
+<button class="calcKey" onclick="calcInput('3')">3</button>
+<button class="calcKey op" onclick="calcInput('+')">+</button>
 
-<div class="calc-row">
-<button class="calc-btn" onclick="calcInput('(')">(</button>
-<button class="calc-btn" onclick="calcInput('0')">0</button>
-<button class="calc-btn" onclick="calcInput('.')">.</button>
-<button class="calc-btn equal" onclick="calcEquals()">=</button>
-</div>
-
-
-<div class="section-title">
-<h2>Financial calculator</h2>
-</div>
-
-<div class="fin-grid">
-
-<button class="fin-card" onclick="openFinancial('emi')">
-<h4>🏠 EMI</h4>
-<p>Monthly loan payment</p>
-</button>
-
-<button class="fin-card" onclick="openFinancial('compound')">
-<h4>📈 Compound</h4>
-<p>Growth with compounding</p>
-</button>
-
-<button class="fin-card" onclick="openFinancial('simple')">
-<h4>💵 Simple Interest</h4>
-<p>Calculate interest</p>
-</button>
-
-<button class="fin-card" onclick="openFinancial('discount')">
-<h4>🏷️ Discount</h4>
-<p>Sale price calculator</p>
-</button>
-
-<button class="fin-card" onclick="openFinancial('gst')">
-<h4>🧾 GST</h4>
-<p>Tax calculation</p>
-</button>
-
-<button class="fin-card" onclick="openFinancial('profit')">
-<h4>📊 Profit/Loss</h4>
-<p>Calculate margin</p>
-</button>
-
-<button class="fin-card" onclick="openFinancial('change')">
-<h4>↕️ % Change</h4>
-<p>Percentage increase</p>
-</button>
-
-<button class="fin-card" onclick="openFinancial('split')">
-<h4>👥 Split</h4>
-<p>Divide an amount</p>
-</button>
+<button class="calcKey wide" onclick="calcInput('0')">0</button>
+<button class="calcKey" onclick="calcInput('.')">.</button>
+<button class="calcKey equal" onclick="calcEquals()">=</button>
 
 </div>
-
-<div class="section-title">
-<h2>Calculator history</h2>
 </div>
-
-<div class="list-card" id="calcHistory"></div>
 
 </section>
 
 
-<section class="page" id="settingsPage">
+<!-- SETTINGS -->
 
-<div class="section-title">
+<section id="settings" class="page">
+
+<div class="sectionTitle">
 <h2>Settings</h2>
 </div>
 
-<div class="card">
+<div class="formCard">
 
-<div class="settings-row">
+<div class="setting">
 <div>
-<div class="settings-title">Hide balance</div>
-<div class="settings-sub">Blur sensitive amounts on the home screen.</div>
+<b>Currency</b>
+<span>Currency used throughout Pocki</span>
 </div>
-<button class="switch" id="hideSwitch" onclick="toggleBalance()">
-<span></span>
+<b>₹ INR</b>
+</div>
+
+<div class="setting">
+<div>
+<b>Animations</b>
+<span>Interface motion effects</span>
+</div>
+
+<button id="animToggle"
+class="toggle on"
+onclick="toggleSetting('animations')">
+<i></i>
 </button>
 </div>
 
-<div class="settings-row">
+<div class="setting">
 <div>
-<div class="settings-title">Currency</div>
-<div class="settings-sub">Currency used throughout Pocki.</div>
+<b>Confirm destructive actions</b>
+<span>Use Pocki's confirmation screen</span>
 </div>
 
-<select id="currencySelect" style="width:95px" onchange="changeCurrency(this.value)">
-<option value="₹">₹ INR</option>
-<option value="$">$ USD</option>
-<option value="€">€ EUR</option>
-<option value="£">£ GBP</option>
-</select>
-</div>
-
-<div class="settings-row">
-<div>
-<div class="settings-title">Data backup</div>
-<div class="settings-sub">Export your Pocki data to a file.</div>
-</div>
-<button class="btn blue" style="padding:9px 12px" onclick="exportData()">Export</button>
-</div>
-
-<div class="settings-row">
-<div>
-<div class="settings-title">Restore data</div>
-<div class="settings-sub">Import a previous Pocki backup.</div>
-</div>
-<button class="btn" style="padding:9px 12px" onclick="document.getElementById('importFile').click()">Import</button>
-</div>
-
-<div class="settings-row">
-<div>
-<div class="settings-title">Reset Pocki</div>
-<div class="settings-sub">Delete all local money data.</div>
-</div>
-<button class="btn danger" style="padding:9px 12px" onclick="confirmReset()">Reset</button>
+<button id="confirmToggle"
+class="toggle on"
+onclick="toggleSetting('confirm')">
+<i></i>
+</button>
 </div>
 
 </div>
 
-<div class="section-title">
-<h2>About</h2>
+
+<button
+class="btn primary"
+style="width:100%;margin-top:14px"
+onclick="openLockSetup()">
+
+<span id="securityButtonText">Create Vault Passcode</span>
+
+</button>
+
+<button
+id="lockNowButton"
+class="btn"
+style="width:100%;margin-top:9px;display:none"
+onclick="lockApp()">
+
+Lock Pocki Now
+
+</button>
+
+<div style="
+font-size:10px;
+color:var(--muted);
+line-height:1.6;
+margin-top:13px">
+
+Create a custom physical-style wheel combination.
+Pocki never generates a password automatically.
+
 </div>
 
-<div class="card">
-<div class="stat-label">Pocki</div>
-<p style="font-size:13px;line-height:1.6;color:var(--muted)">
-A private personal money-management space. Your data is stored locally on this device.
-</p>
+</div>
+
+
+<div class="sectionTitle">
+<h2>Data</h2>
+</div>
+
+<div class="formCard">
+
+<button
+class="btn"
+style="width:100%;margin-bottom:9px"
+onclick="exportData()">
+Export Pocki Data
+</button>
+
+<button
+class="btn"
+style="width:100%;margin-bottom:9px"
+onclick="document.getElementById('importFile').click()">
+Import Pocki Data
+</button>
+
+<input
+id="importFile"
+type="file"
+accept=".json"
+style="display:none"
+onchange="importData(event)">
+
+<button
+class="btn danger"
+style="width:100%"
+onclick="resetData()">
+Reset All Data
+</button>
+
+</div>
+
+<div style="
+text-align:center;
+color:#555b68;
+font-size:10px;
+margin-top:25px">
+Pocki • Your money, organized.
 </div>
 
 </section>
@@ -1396,26 +984,38 @@ A private personal money-management space. Your data is stored locally on this d
 </main>
 
 
-<nav class="bottomnav">
+<!-- NAVIGATION -->
 
-<button class="navbtn active" data-page="home" onclick="showPage('home')">
-<span class="navicon">⌂</span>Home
+<nav class="bottom">
+
+<button class="nav active"
+data-page="home"
+onclick="showPage('home')">
+<span>⌂</span>Home
 </button>
 
-<button class="navbtn" data-page="transactions" onclick="showPage('transactions')">
-<span class="navicon">↕</span>Activity
+<button class="nav"
+data-page="activity"
+onclick="showPage('activity')">
+<span>↕</span>Activity
 </button>
 
-<button class="navbtn" data-page="savings" onclick="showPage('savings')">
-<span class="navicon">◎</span>Savings
+<button class="nav"
+data-page="savings"
+onclick="showPage('savings')">
+<span>◇</span>Savings
 </button>
 
-<button class="navbtn" data-page="calculator" onclick="showPage('calculator')">
-<span class="navicon">＋</span>Calculate
+<button class="nav"
+data-page="calculator"
+onclick="showPage('calculator')">
+<span>⌗</span>Calc
 </button>
 
-<button class="navbtn" data-page="settings" onclick="showPage('settings')">
-<span class="navicon">⚙</span>Settings
+<button class="nav"
+data-page="settings"
+onclick="showPage('settings')">
+<span>⚙</span>Settings
 </button>
 
 </nav>
@@ -1423,1706 +1023,2821 @@ A private personal money-management space. Your data is stored locally on this d
 </div>
 
 
-<input type="file" id="importFile" accept=".json,application/json" hidden onchange="importData(event)">
+<!-- =========================================================
+     TRANSACTION MODAL
+     ========================================================= -->
 
-
-<div class="modal" id="transactionModal">
+<div id="txModal"
+class="modal"
+onclick="backdrop(event,'txModal')">
 
 <div class="sheet">
 
-<div class="sheet-head">
-<h3 id="transactionTitle">Add Money</h3>
-<button class="close" onclick="closeModal('transactionModal')">×</button>
+<div class="sheetHead">
+<h2 id="txTitle">Add Money</h2>
+<button class="close" onclick="closeModal('txModal')">×</button>
 </div>
+
+<div class="formCard">
 
 <label>Amount</label>
-<input class="input" id="txAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
 
-<div class="form-grid">
+<input
+id="txAmount"
+type="number"
+inputmode="decimal"
+placeholder="0.00">
 
-<div>
-<label>Type</label>
-<select class="input" id="txType">
-<option value="income">Money in</option>
-<option value="expense">Expense</option>
-<option value="savings">Savings</option>
-</select>
-</div>
-
-<div>
 <label>Category</label>
-<select class="input" id="txCategory">
+
+<select id="txCategory">
+
 <option>General</option>
+<option>Savings</option>
+<option>Gift</option>
+<option>Work</option>
 <option>Food</option>
-<option>Travel</option>
+<option>Transport</option>
 <option>Shopping</option>
-<option>Education</option>
 <option>Entertainment</option>
-<option>Health</option>
+<option>Education</option>
 <option>Bills</option>
 <option>Other</option>
+
 </select>
-</div>
 
-<div class="full">
-<label>Description</label>
-<input class="input" id="txDescription" maxlength="80" placeholder="What was this for?">
-</div>
-
-<div>
-<label>Date</label>
-<input class="input" id="txDate" type="date">
-</div>
-
-<div>
 <label>Note</label>
-<input class="input" id="txNote" maxlength="100" placeholder="Optional">
-</div>
+
+<input
+id="txNote"
+maxlength="80"
+placeholder="What was this for?">
+
+<button
+id="txSave"
+class="btn primary"
+style="width:100%;margin-top:16px"
+onclick="saveTransaction()">
+
+Save Transaction
+
+</button>
 
 </div>
-
-<div class="actions">
-<button class="btn" onclick="closeModal('transactionModal')">Cancel</button>
-<button class="btn primary" onclick="saveTransaction()">Save</button>
-</div>
-
 </div>
 </div>
 
 
-<div class="modal" id="goalModal">
+<!-- =========================================================
+     CASH WALLET
+     ========================================================= -->
+
+<div id="cashModal"
+class="modal"
+onclick="backdrop(event,'cashModal')">
 
 <div class="sheet">
 
-<div class="sheet-head">
-<h3 id="goalTitle">New Savings Goal</h3>
+<div class="sheetHead">
+<h2>Cash Wallet</h2>
+<button class="close" onclick="closeModal('cashModal')">×</button>
+</div>
+
+<div style="
+color:var(--muted);
+font-size:11px;
+line-height:1.5">
+
+Manage the physical cash you currently have.
+Enter the number of notes or coins you own.
+
+</div>
+
+<div class="cashSummary">
+
+<div class="cashStat">
+<div class="statLabel">Cash in notes</div>
+<b id="cashNotesSummary">₹0</b>
+</div>
+
+<div class="cashStat">
+<div class="statLabel">Cash in coins</div>
+<b id="cashCoinsSummary">₹0</b>
+</div>
+
+</div>
+
+<div class="cashSection">
+
+<div class="cashHeader">
+<b>Banknotes</b>
+<span>Number of notes</span>
+</div>
+
+<div id="notesRows"></div>
+
+</div>
+
+<div class="cashSection">
+
+<div class="cashHeader">
+<b>Coins</b>
+<span>Number of coins</span>
+</div>
+
+<div id="coinsRows"></div>
+
+</div>
+
+<div class="cashTotal">
+<span>Total physical cash</span>
+<b id="cashGrandTotal">₹0</b>
+</div>
+
+<div class="cashActions">
+
+<button class="btn" onclick="clearCashFields()">Clear</button>
+
+<button class="btn primary" onclick="saveCashWallet()">
+Save Cash
+</button>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- =========================================================
+     GOAL
+     ========================================================= -->
+
+<div id="goalModal"
+class="modal"
+onclick="backdrop(event,'goalModal')">
+
+<div class="sheet">
+
+<div class="sheetHead">
+<h2 id="goalTitle">New Savings Goal</h2>
 <button class="close" onclick="closeModal('goalModal')">×</button>
 </div>
 
-<label>Goal name</label>
-<input class="input" id="goalName" maxlength="50" placeholder="e.g. New phone">
+<div class="formCard">
 
-<div class="form-grid">
+<label>Goal name</label>
+
+<input
+id="goalName"
+maxlength="40"
+placeholder="e.g. New headphones">
+
+<div class="formRow">
 
 <div>
 <label>Target amount</label>
-<input class="input" id="goalTarget" type="number" inputmode="decimal" min="1" placeholder="0">
+<input
+id="goalTarget"
+type="number"
+inputmode="decimal"
+placeholder="0">
 </div>
 
 <div>
 <label>Already saved</label>
-<input class="input" id="goalSaved" type="number" inputmode="decimal" min="0" placeholder="0">
-</div>
-
-<div>
-<label>Target date</label>
-<input class="input" id="goalDate" type="date">
-</div>
-
-<div>
-<label>Icon</label>
-<select class="input" id="goalIcon">
-<option>🎯</option>
-<option>📱</option>
-<option>💻</option>
-<option>🎓</option>
-<option>🚲</option>
-<option>✈️</option>
-<option>🎮</option>
-<option>💰</option>
-<option>🏠</option>
-</select>
+<input
+id="goalSaved"
+type="number"
+inputmode="decimal"
+placeholder="0">
 </div>
 
 </div>
 
-<div class="actions">
-<button class="btn" onclick="closeModal('goalModal')">Cancel</button>
-<button class="btn primary" onclick="saveGoal()">Create Goal</button>
+<label>Deadline (optional)</label>
+
+<input
+id="goalDate"
+type="date">
+
+<button
+class="btn primary"
+style="width:100%;margin-top:16px"
+onclick="saveGoal()">
+
+Save Goal
+
+</button>
+
 </div>
 
 </div>
 </div>
 
 
-<div class="modal" id="confirmModal">
+<!-- =========================================================
+     VAULT SETUP
+     ========================================================= -->
+
+<div id="lockSetupModal" class="modal">
 
 <div class="sheet">
 
-<div class="confirm-icon" id="confirmIcon">⚠️</div>
+<div class="sheetHead">
 
-<h3 style="text-align:center;margin:5px 0 7px" id="confirmTitle">
-Confirm
-</h3>
+<h2 id="setupTitle">Create Vault Passcode</h2>
 
-<div class="confirm-text" id="confirmText"></div>
+<button
+class="close"
+onclick="closeLockSetup()">
+×
+</button>
 
-<div class="actions">
-<button class="btn" onclick="closeModal('confirmModal')">Cancel</button>
-<button class="btn danger" id="confirmAction">Confirm</button>
+</div>
+
+<div class="setupVault">
+
+<div style="
+font-size:11px;
+color:var(--muted);
+line-height:1.5;
+max-width:300px">
+
+Choose your combination one number at a time.
+Rotate the wheel until the live number reaches the number
+you want, then release the wheel.
+
+</div>
+
+<div id="setupLiveNumber" class="setupLiveNumber">0</div>
+
+<div class="setupLockAssembly">
+
+<div class="lockOuter"></div>
+
+<div class="setupPointer"></div>
+
+<div class="setupWheel" id="setupWheel">
+
+<div class="wheelCenter">🔒</div>
+
+</div>
+
+</div>
+
+<div class="sequenceDots" id="sequenceDots"></div>
+
+<div class="setupHint">
+The selected numbers are intentionally hidden.
+Only the progress dots are shown.
+</div>
+
+<div class="formRow" style="width:100%;margin-top:8px">
+
+<button
+class="btn"
+onclick="setupUndo()">
+Undo
+</button>
+
+<button
+class="btn"
+onclick="setupClear()">
+Clear
+</button>
+
+</div>
+
+<button
+class="btn primary"
+style="width:100%;margin-top:9px"
+onclick="finishLockSetup()">
+
+Save Vault Passcode
+
+</button>
+
 </div>
 
 </div>
 </div>
 
 
-<div class="modal" id="financialModal">
+<!-- =========================================================
+     CONFIRM
+     ========================================================= -->
 
-<div class="sheet">
+<div id="confirmModal" class="modal">
 
-<div class="sheet-head">
-<h3 id="financialTitle">Financial Calculator</h3>
-<button class="close" onclick="closeModal('financialModal')">×</button>
+<div class="sheet"
+style="border-radius:25px;margin:16px;width:calc(100% - 32px)">
+
+<div class="sheetHead">
+
+<h2 id="confirmTitle">Confirm</h2>
+
+<button
+class="close"
+onclick="closeModal('confirmModal')">
+×
+</button>
+
 </div>
 
-<div id="financialBody"></div>
+<p
+id="confirmText"
+style="color:var(--muted);font-size:12px;line-height:1.6">
+</p>
 
-<div class="actions">
-<button class="btn" onclick="closeModal('financialModal')">Close</button>
-<button class="btn primary" onclick="calculateFinancial()">Calculate</button>
+<div
+class="formRow"
+style="margin-top:18px">
+
+<button
+class="btn"
+onclick="closeModal('confirmModal')">
+Cancel
+</button>
+
+<button
+id="confirmYes"
+class="btn primary">
+Continue
+</button>
+
 </div>
 
-<div id="financialResult" style="display:none;margin-top:14px"></div>
+</div>
+</div>
+
+
+<!-- =========================================================
+     NUMBER INPUT
+     ========================================================= -->
+
+<div id="inputModal" class="modal">
+
+<div
+class="sheet"
+style="border-radius:25px;margin:16px;width:calc(100% - 32px)">
+
+<div class="sheetHead">
+
+<h2 id="inputTitle">Enter Amount</h2>
+
+<button
+class="close"
+onclick="cancelInput()">
+×
+</button>
+
+</div>
+
+<div
+id="inputDescription"
+style="color:var(--muted);font-size:12px">
+</div>
+
+<input
+id="inputAmount"
+type="number"
+inputmode="decimal"
+placeholder="0"
+style="margin-top:12px">
+
+<button
+class="btn primary"
+style="width:100%;margin-top:13px"
+onclick="submitInput()">
+
+Continue
+
+</button>
 
 </div>
 </div>
 
 
-<div class="toast" id="toast"></div>
+<div id="toast" class="toast"></div>
 
 
 <script>
 
-const KEY="pocki_grand_final_animated";
+/* =========================================================
+   DATA
+   ========================================================= */
 
-let state=JSON.parse(localStorage.getItem(KEY)||"null")||{
- transactions:[],
- goals:[],
- currency:"₹",
- hidden:false,
- calcHistory:[],
- calcMemory:0
+const STORAGE_KEY="pocki_data_v8";
+
+const DEFAULT_DATA={
+transactions:[],
+goals:[],
+cash:{
+notes:{2000:0,500:0,200:0,100:0,50:0,20:0,10:0},
+coins:{20:0,10:0,5:0,2:0,1:0}
+},
+settings:{
+animations:true,
+confirm:true
+},
+security:{
+enabled:false,
+sequence:[]
+}
 };
 
-let txFilter="all";
+let data=loadData();
+
+let transactionType="income";
 let editingGoal=null;
-let financialType=null;
+let pendingConfirm=null;
+let pendingInputResolve=null;
 
-const $=id=>document.getElementById(id);
+const TOTAL_NUMBERS=50;
+const WHEEL_STEP=360/TOTAL_NUMBERS;
+
+const noteDenominations=[2000,500,200,100,50,20,10];
+const coinDenominations=[20,10,5,2,1];
 
 
-function save(){
- localStorage.setItem(KEY,JSON.stringify(state));
- renderAll();
+/* =========================================================
+   DATA HELPERS
+   ========================================================= */
+
+function clone(o){
+return JSON.parse(JSON.stringify(o));
 }
 
-
-function money(n){
- return state.currency+Number(n||0).toLocaleString("en-IN",{
-  minimumFractionDigits:2,
-  maximumFractionDigits:2
- });
+function uid(){
+return Date.now().toString(36)+Math.random().toString(36).slice(2,9);
 }
 
+function loadData(){
 
-function rawMoney(n){
- return state.currency+Number(n||0).toLocaleString("en-IN",{
-  maximumFractionDigits:2
- });
+try{
+
+const s=JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+if(!s)return clone(DEFAULT_DATA);
+
+return{
+...clone(DEFAULT_DATA),
+...s,
+
+transactions:Array.isArray(s.transactions)
+?s.transactions
+:[],
+
+goals:Array.isArray(s.goals)
+?s.goals
+:[],
+
+cash:{
+notes:{
+...DEFAULT_DATA.cash.notes,
+...(s.cash?.notes||{})
+},
+coins:{
+...DEFAULT_DATA.cash.coins,
+...(s.cash?.coins||{})
+}
+},
+
+settings:{
+...DEFAULT_DATA.settings,
+...(s.settings||{})
+},
+
+security:{
+enabled:!!s.security?.enabled,
+sequence:Array.isArray(s.security?.sequence)
+?s.security.sequence
+.map(Number)
+.filter(n=>Number.isInteger(n)&&n>=0&&n<TOTAL_NUMBERS)
+:[]
 }
 
+};
 
-function today(){
- return new Date().toISOString().slice(0,10);
+}catch{
+
+return clone(DEFAULT_DATA);
+
 }
 
-
-function esc(s){
- return String(s??"").replace(/[&<>"']/g,m=>({
-  "&":"&amp;",
-  "<":"&lt;",
-  ">":"&gt;",
-  '"':"&quot;",
-  "'":"&#039;"
- }[m]));
 }
 
+function saveData(){
 
-function toast(msg){
- const t=$("toast");
- t.textContent=msg;
- t.classList.add("show");
-
- clearTimeout(window.toastTimer);
-
- window.toastTimer=setTimeout(()=>{
-  t.classList.remove("show");
- },2200);
-}
-
-
-function showPage(page){
-
- document.querySelectorAll(".page").forEach(x=>{
-  x.classList.remove("active");
- });
-
- const p=$(page+"Page");
-
- if(p){
-  p.classList.add("active");
- }
-
- document.querySelectorAll(".navbtn").forEach(x=>{
-  x.classList.toggle("active",x.dataset.page===page);
- });
-
- if(page==="home")renderHome();
- if(page==="transactions")renderTransactions();
- if(page==="savings")renderSavings();
- if(page==="stats")renderStats();
- if(page==="calculator")renderCalculator();
-
- window.scrollTo({
-  top:0,
-  behavior:"smooth"
- });
-}
-
-
-function openModal(id){
- $(id).classList.add("show");
-}
-
-
-function closeModal(id){
- $(id).classList.remove("show");
-}
-
-
-function toggleBalance(){
-
- state.hidden=!state.hidden;
-
- $("balance").classList.toggle("hidden",state.hidden);
-
- $("hideSwitch").classList.toggle("on",state.hidden);
-
- $("privacyBtn").textContent=state.hidden?"◌":"◉";
-
- localStorage.setItem(KEY,JSON.stringify(state));
-}
-
-
-function changeCurrency(v){
- state.currency=v;
- save();
- toast("Currency updated");
-}
-
-
-function totals(){
-
- let income=0;
- let expense=0;
- let savings=0;
-
- state.transactions.forEach(t=>{
-
-  if(t.type==="income")income+=Number(t.amount);
-
-  if(t.type==="expense")expense+=Number(t.amount);
-
-  if(t.type==="savings")savings+=Number(t.amount);
-
- });
-
- return{
-  income,
-  expense,
-  savings,
-  balance:income-expense-savings
- };
-}
-
-
-function renderAll(){
- renderHome();
- renderTransactions();
- renderSavings();
- renderStats();
- renderCalculator();
-}
-
-
-function renderHome(){
-
- const t=totals();
-
- $("balance").textContent=money(t.balance);
-
- $("balance").classList.toggle("hidden",state.hidden);
-
- $("homeSavings").textContent=rawMoney(t.savings);
-
- const month=new Date().toISOString().slice(0,7);
-
- const spent=state.transactions
- .filter(x=>x.type==="expense"&&x.date?.startsWith(month))
- .reduce((a,x)=>a+Number(x.amount),0);
-
- $("homeSpent").textContent=rawMoney(spent);
-
-
- const goals=$("homeGoals");
-
- if(!state.goals.length){
-
-  goals.innerHTML=
-  '<div class="empty">No savings goals yet.<br>Create one and start building toward it.</div>';
-
- }else{
-
-  goals.innerHTML=
-  state.goals.slice(0,3).map(goalHTML).join("");
-
- }
-
-
- const recent=[...state.transactions]
- .sort((a,b)=>new Date(b.date)-new Date(a.date))
- .slice(0,5);
-
- $("recentTransactions").innerHTML=
- recent.length
- ?recent.map(txHTML).join("")
- :'<div class="empty">No activity yet.<br>Add your first transaction.</div>';
-}
-
-
-function goalHTML(g){
-
- const pct=Math.min(
-  100,
-  (Number(g.saved)/Number(g.target))*100||0
- );
-
- const completed=Number(g.saved)>=Number(g.target);
-
- return `
- <div class="goal ${completed?"completed-goal":""}">
-  <div class="goal-head">
-   <span>${esc(g.icon)} ${esc(g.name)}</span>
-   <span class="${completed?"green":""}">
-   ${completed?"✓ Complete":pct.toFixed(0)+"%"}
-   </span>
-  </div>
-
-  <div class="progress">
-   <span style="width:${pct}%"></span>
-  </div>
-
-  <div class="goal-meta">
-   <span>${money(g.saved)} saved</span>
-   <span>${money(g.target)} target</span>
-  </div>
-
-  <div class="goal-actions">
-   <button onclick="addToGoal('${g.id}')">＋ Add</button>
-   <button onclick="editGoal('${g.id}')">Edit</button>
-   <button onclick="deleteGoal('${g.id}')">Delete</button>
-  </div>
- </div>`;
-}
-
-
-function txIcon(t){
-
- if(t.type==="income")return"↓";
- if(t.type==="expense")return"↑";
- return"◎";
-}
-
-
-function txHTML(t){
-
- const cls=
- t.type==="income"
- ?"green"
- :t.type==="expense"
- ?"red"
- :"yellow";
-
- const sign=
- t.type==="income"
- ?"+"
- :t.type==="expense"
- ?"−"
- :"•";
-
- return `
- <div class="txn">
-
-  <div class="txn-icon">${txIcon(t)}</div>
-
-  <div class="txn-main">
-   <div class="txn-name">${esc(t.description||"Untitled")}</div>
-   <div class="txn-meta">
-   ${esc(t.category||"General")} · ${esc(t.date||"")}
-   </div>
-  </div>
-
-  <div class="txn-amount ${cls}">
-   ${sign}${money(t.amount)}
-  </div>
-
-  <button
-   onclick="deleteTransaction('${t.id}')"
-   style="background:none;color:var(--muted);font-size:16px;padding:5px">
-   ⋮
-  </button>
-
- </div>`;
-}
-
-
-function renderTransactions(){
-
- let arr=[...state.transactions]
- .sort((a,b)=>new Date(b.date)-new Date(a.date));
-
- const q=($("transactionSearch")?.value||"").toLowerCase();
-
- if(txFilter!=="all"){
-  arr=arr.filter(t=>t.type===txFilter);
- }
-
- if(q){
-
-  arr=arr.filter(t=>
-   (t.description+" "+t.category+" "+t.note)
-   .toLowerCase()
-   .includes(q)
-  );
-
- }
-
- $("allTransactions").innerHTML=
- arr.length
- ?arr.map(txHTML).join("")
- :'<div class="empty">No matching transactions.</div>';
-}
-
-
-function setTxFilter(f,el){
-
- txFilter=f;
-
- document.querySelectorAll(".filter")
- .forEach(x=>x.classList.remove("active"));
-
- el.classList.add("active");
-
- renderTransactions();
-}
-
-
-function openTransaction(type){
-
- $("txAmount").value="";
- $("txDescription").value="";
- $("txNote").value="";
- $("txDate").value=today();
-
- $("txType").value=
- type==="savings"
- ?"savings"
- :type;
-
- $("transactionTitle").textContent=
- type==="income"
- ?"Add Money"
- :type==="expense"
- ?"Add Expense"
- :"Save Money";
-
- openModal("transactionModal");
-
- setTimeout(()=>{
-  $("txAmount").focus();
- },200);
-}
-
-
-function saveTransaction(){
-
- const amount=Number($("txAmount").value);
-
- if(!amount||amount<=0){
-  toast("Enter a valid amount");
-  return;
- }
-
- const type=$("txType").value;
-
- const t={
-  id:crypto.randomUUID?.()||String(Date.now()),
-  amount,
-  type,
-  category:$("txCategory").value,
-  description:
-   $("txDescription").value.trim()||
-   (
-    type==="expense"
-    ?"Expense"
-    :type==="savings"
-    ?"Savings"
-    :"Money added"
-   ),
-  date:$("txDate").value||today(),
-  note:$("txNote").value.trim()
- };
-
- state.transactions.push(t);
-
- closeModal("transactionModal");
-
- save();
-
- toast(
-  type==="expense"
-  ?"Expense added"
-  :type==="savings"
-  ?"Savings recorded"
-  :"Money added"
- );
-}
-
-
-function deleteTransaction(id){
-
- const t=state.transactions.find(x=>x.id===id);
-
- if(!t)return;
-
- confirmBox(
-  "Delete transaction?",
-  "This transaction will be removed from Pocki.",
-  "🗑️",
-  ()=>{
-   state.transactions=
-   state.transactions.filter(x=>x.id!==id);
-
-   save();
-
-   toast("Transaction deleted");
-  }
- );
-}
-
-
-function openGoalModal(){
-
- editingGoal=null;
-
- $("goalTitle").textContent="New Savings Goal";
-
- $("goalName").value="";
- $("goalTarget").value="";
- $("goalSaved").value="";
- $("goalDate").value="";
- $("goalIcon").value="🎯";
-
- const btn=document.querySelector("#goalModal .btn.primary");
-
- if(btn)btn.textContent="Create Goal";
-
- openModal("goalModal");
-}
-
-
-function saveGoal(){
-
- const name=$("goalName").value.trim();
-
- const target=Number($("goalTarget").value);
-
- const saved=Number($("goalSaved").value)||0;
-
- if(!name||target<=0){
-  toast("Enter a goal name and target");
-  return;
- }
-
- if(saved>target){
-  toast("Saved amount cannot exceed target");
-  return;
- }
-
- if(editingGoal){
-
-  Object.assign(editingGoal,{
-   name,
-   target,
-   saved,
-   deadline:$("goalDate").value,
-   icon:$("goalIcon").value
-  });
-
-  toast("Goal updated");
-
- }else{
-
-  state.goals.push({
-   id:crypto.randomUUID?.()||String(Date.now()),
-   name,
-   target,
-   saved,
-   deadline:$("goalDate").value,
-   icon:$("goalIcon").value
-  });
-
-  toast("Savings goal created");
- }
-
- closeModal("goalModal");
-
- save();
-}
-
-
-function editGoal(id){
-
- const g=state.goals.find(x=>x.id===id);
-
- if(!g)return;
-
- editingGoal=g;
-
- $("goalTitle").textContent="Edit Savings Goal";
-
- $("goalName").value=g.name;
- $("goalTarget").value=g.target;
- $("goalSaved").value=g.saved;
- $("goalDate").value=g.deadline||"";
- $("goalIcon").value=g.icon||"🎯";
-
- const btn=document.querySelector("#goalModal .btn.primary");
-
- if(btn)btn.textContent="Save Changes";
-
- openModal("goalModal");
-}
-
-
-function addToGoal(id){
-
- const g=state.goals.find(x=>x.id===id);
-
- if(!g)return;
-
- openNumberDialog(
-  "Add to savings goal",
-  `How much would you like to add to "${g.name}"?`,
-  amount=>{
-
-   if(g.saved+amount>g.target){
-
-    toast("That would exceed the goal target");
-    return;
-   }
-
-   g.saved+=amount;
-
-   save();
-
-   if(g.saved>=g.target){
-    toast("🎉 Savings goal completed!");
-   }else{
-    toast("Goal progress updated");
-   }
-  }
- );
-}
-
-
-function openNumberDialog(title,text,callback){
-
- const modal=document.createElement("div");
-
- modal.className="modal show";
-
- modal.innerHTML=`
- <div class="sheet">
-  <div class="sheet-head">
-   <h3>${esc(title)}</h3>
-   <button class="close">×</button>
-  </div>
-
-  <p style="color:var(--muted);font-size:13px;line-height:1.5">
-  ${esc(text)}
-  </p>
-
-  <label>Amount</label>
-
-  <input
-   class="input"
-   id="temporaryNumberInput"
-   type="number"
-   min="0"
-   step="0.01"
-   inputmode="decimal"
-   placeholder="0.00">
-
-  <div class="actions">
-   <button class="btn cancel">Cancel</button>
-   <button class="btn primary saveNumber">Add</button>
-  </div>
- </div>`;
-
- document.body.appendChild(modal);
-
- const remove=()=>{
-  modal.remove();
- };
-
- modal.querySelector(".close").onclick=remove;
- modal.querySelector(".cancel").onclick=remove;
-
- modal.querySelector(".saveNumber").onclick=()=>{
-
-  const n=Number(
-   modal.querySelector("#temporaryNumberInput").value
-  );
-
-  if(!n||n<=0){
-   toast("Enter a valid amount");
-   return;
-  }
-
-  remove();
-  callback(n);
- };
-
- setTimeout(()=>{
-  modal.querySelector("#temporaryNumberInput").focus();
- },150);
-}
-
-
-function deleteGoal(id){
-
- confirmBox(
-  "Delete savings goal?",
-  "The goal and its progress will be removed.",
-  "🎯",
-  ()=>{
-   state.goals=
-   state.goals.filter(x=>x.id!==id);
-
-   save();
-
-   toast("Goal deleted");
-  }
- );
-}
-
-
-function renderSavings(){
-
- const t=totals();
-
- $("savingsTotal").textContent=money(t.savings);
-
- $("goalsList").innerHTML=
- state.goals.length
- ?state.goals.map(g=>
-  `<div class="card" style="margin-bottom:11px">
-  ${goalHTML(g)}
-  </div>`
- ).join("")
- :'<div class="card"><div class="empty">No savings goals yet.</div></div>';
-}
-
-
-function renderStats(){
-
- const t=totals();
-
- $("statIncome").textContent=rawMoney(t.income);
- $("statExpense").textContent=rawMoney(t.expense);
- $("statCount").textContent=state.transactions.length;
-
- $("statGoals").textContent=
- state.goals.filter(
-  g=>Number(g.saved)>=Number(g.target)
- ).length;
-
-
- const days=[];
-
- for(let i=6;i>=0;i--){
-
-  const d=new Date();
-
-  d.setDate(d.getDate()-i);
-
-  days.push(
-   d.toISOString().slice(0,10)
-  );
- }
-
-
- const vals=days.map(d=>
-  state.transactions
-  .filter(t=>t.type==="expense"&&t.date===d)
-  .reduce((a,t)=>a+Number(t.amount),0)
- );
-
- const max=Math.max(...vals,1);
-
- $("chart").innerHTML=
- days.map((d,i)=>`
-
- <div class="barwrap">
-
-  <div
-   class="bar"
-   style="
-   height:${Math.max(
-    3,
-    vals[i]/max*150
-   )}px;
-   animation-delay:${i*0.06}s">
-  </div>
-
-  <span class="barlabel">${d.slice(8)}</span>
-
- </div>
-
- `).join("");
-
-
- const cats={};
-
- state.transactions
- .filter(t=>t.type==="expense")
- .forEach(t=>{
-  cats[t.category]=
-  (cats[t.category]||0)+Number(t.amount);
- });
-
-
- const list=
- Object.entries(cats)
- .sort((a,b)=>b[1]-a[1]);
-
-
- $("categoryStats").innerHTML=
- list.length
- ?list.map(([c,v])=>`
-
- <div style="
- display:flex;
- justify-content:space-between;
- padding:11px 2px;
- border-bottom:1px solid var(--line);
- font-size:13px">
-
- <span>${esc(c)}</span>
-
- <b class="red">${money(v)}</b>
-
- </div>
-
- `).join("")
- :'<div class="empty">No expense data yet.</div>';
-}
-
-
-function confirmBox(title,text,icon,action){
-
- $("confirmTitle").textContent=title;
- $("confirmText").textContent=text;
- $("confirmIcon").textContent=icon;
-
- const b=$("confirmAction");
-
- b.onclick=()=>{
-  closeModal("confirmModal");
-  action();
- };
-
- openModal("confirmModal");
-}
-
-
-function confirmReset(){
-
- confirmBox(
-  "Reset Pocki?",
-  "This permanently deletes your transactions, goals and calculator history stored on this device.",
-  "⚠️",
-  ()=>{
-   localStorage.removeItem(KEY);
-   location.reload();
-  }
- );
-}
-
-
-function exportData(){
-
- const blob=new Blob(
-  [JSON.stringify(state,null,2)],
-  {type:"application/json"}
- );
-
- const url=URL.createObjectURL(blob);
-
- const a=document.createElement("a");
-
- a.href=url;
- a.download="pocki-backup-"+today()+".json";
-
- document.body.appendChild(a);
- a.click();
- a.remove();
-
- URL.revokeObjectURL(url);
-
- toast("Backup exported");
-}
-
-
-function importData(e){
-
- const file=e.target.files[0];
-
- if(!file)return;
-
- const reader=new FileReader();
-
- reader.onload=()=>{
-
-  try{
-
-   const imported=
-   JSON.parse(reader.result);
-
-   if(
-    !imported||
-    !Array.isArray(imported.transactions)||
-    !Array.isArray(imported.goals)
-   ){
-    throw new Error();
-   }
-
-   confirmBox(
-    "Restore backup?",
-    "Your current local Pocki data will be replaced by this backup.",
-    "📦",
-    ()=>{
-     state={...state,...imported};
-     save();
-     toast("Backup restored");
-    }
-   );
-
-  }catch{
-   toast("Invalid Pocki backup");
-  }
- };
-
- reader.readAsText(file);
-
- e.target.value="";
-}
-
-
-/* CALCULATOR */
-
-let calcExpr="";
-let calcJustEvaluated=false;
-
-
-function calcInput(v){
-
- if(
-  calcJustEvaluated&&
-  /[0-9.(]/.test(v)
- ){
-  calcExpr="";
-  calcJustEvaluated=false;
- }
-
- if(v==="."){
-
-  const parts=
-  calcExpr.split(/[+−×÷()]/);
-
-  const last=
-  parts[parts.length-1];
-
-  if(last.includes("."))return;
- }
-
- if(
-  /[+−×÷]/.test(v)&&
-  /[+−×÷]$/.test(calcExpr)
- ){
-  calcExpr=calcExpr.slice(0,-1);
- }
-
- calcExpr+=v;
-
- updateCalc();
-}
-
-
-function updateCalc(){
-
- $("calcExpression").textContent=calcExpr;
-
- try{
-
-  const preview=
-  calcEvaluate(calcExpr);
-
-  $("calcResult").textContent=
-  calcExpr
-  ?formatCalc(preview)
-  :"0";
-
- }catch{
-
-  $("calcResult").textContent="0";
- }
-
- $("calcMemory").textContent=
- state.calcMemory
- ?"M: "+formatCalc(state.calcMemory)
- :"";
-}
-
-
-function calcEvaluate(expr){
-
- if(!expr)return 0;
-
- let s=
- expr
- .replaceAll("×","*")
- .replaceAll("÷","/")
- .replaceAll("−","-")
- .replace(/%/g,"/100");
-
- if(!/^[0-9+\-*/().\s]+$/.test(s)){
-  throw Error();
- }
-
- if(/[/]\s*0(?![.0-9])/.test(s)){
-  throw Error();
- }
-
- return Function(
-  '"use strict";return ('+s+')'
- )();
-}
-
-
-function formatCalc(n){
-
- if(!Number.isFinite(n)){
-  return"Error";
- }
-
- return Number(
-  n.toFixed(10)
- ).toLocaleString(
-  "en-IN",
-  {maximumFractionDigits:10}
- );
-}
-
-
-function calcEquals(){
-
- if(!calcExpr)return;
-
- try{
-
-  const result=
-  calcEvaluate(calcExpr);
-
-  if(!Number.isFinite(result)){
-   throw Error();
-  }
-
-  const display=
-  formatCalc(result);
-
-  state.calcHistory.unshift({
-   expr:calcExpr,
-   result:display,
-   time:Date.now()
-  });
-
-  state.calcHistory=
-  state.calcHistory.slice(0,30);
-
-  calcExpr=
-  String(
-   Number(
-    result.toFixed(12)
-   )
-  );
-
-  calcJustEvaluated=true;
-
-  save();
-
-  updateCalc();
-
- }catch{
-
-  toast("Invalid calculation");
-
-  $("calcResult").textContent="Error";
- }
-}
-
-
-function calcClear(){
-
- calcExpr="";
- calcJustEvaluated=false;
-
- updateCalc();
-}
-
-
-function calcBackspace(){
-
- calcJustEvaluated=false;
-
- calcExpr=
- calcExpr.slice(0,-1);
-
- updateCalc();
-}
-
-
-function calcPercent(){
-
- try{
-
-  const result=
-  calcEvaluate(calcExpr);
-
-  calcExpr=
-  String(result/100);
-
-  updateCalc();
-
- }catch{}
-}
-
-
-function calcMemoryClear(){
-
- state.calcMemory=0;
-
- save();
-
- updateCalc();
-}
-
-
-function calcMemoryRecall(){
-
- calcInput(
-  String(state.calcMemory||0)
- );
-}
-
-
-function calcMemoryAdd(){
-
- try{
-
-  state.calcMemory+=
-  Number(calcEvaluate(calcExpr)||0);
-
-  save();
-
-  updateCalc();
-
- }catch{}
-}
-
-
-function calcMemorySubtract(){
-
- try{
-
-  state.calcMemory-=
-  Number(calcEvaluate(calcExpr)||0);
-
-  save();
-
-  updateCalc();
-
- }catch{}
-}
-
-
-function clearCalcHistory(){
-
- if(!state.calcHistory.length){
-
-  toast("History is already empty");
-
-  return;
- }
-
- confirmBox(
-  "Clear calculator history?",
-  "All saved calculations will be removed.",
-  "🧮",
-  ()=>{
-   state.calcHistory=[];
-   save();
-   toast("History cleared");
-  }
- );
-}
-
-
-function renderCalculator(){
-
- $("calcMemory").textContent=
- state.calcMemory
- ?"M: "+formatCalc(state.calcMemory)
- :"";
-
- const h=$("calcHistory");
-
- h.innerHTML=
- state.calcHistory.length
- ?state.calcHistory.map((x,i)=>`
-
- <div class="txn" onclick="useHistory(${i})">
-
-  <div class="txn-icon">=</div>
-
-  <div class="txn-main">
-
-   <div class="txn-name">
-   ${esc(x.expr)}
-   </div>
-
-   <div class="txn-meta">
-   ${new Date(x.time).toLocaleString()}
-   </div>
-
-  </div>
-
-  <div class="txn-amount green">
-  ${esc(x.result)}
-  </div>
-
- </div>
-
- `).join("")
- :'<div class="empty">No calculations yet.</div>';
-}
-
-
-function useHistory(i){
-
- const x=state.calcHistory[i];
-
- if(!x)return;
-
- calcExpr=x.expr;
-
- calcJustEvaluated=false;
-
- updateCalc();
-}
-
-
-/* FINANCIAL CALCULATOR */
-
-function openFinancial(type){
-
- financialType=type;
-
- const titles={
-  emi:"EMI Calculator",
-  compound:"Compound Interest",
-  simple:"Simple Interest",
-  discount:"Discount Calculator",
-  gst:"GST Calculator",
-  profit:"Profit / Loss",
-  change:"Percentage Change",
-  split:"Split Amount"
- };
-
- $("financialTitle").textContent=
- titles[type];
-
- const fields={
-
-  emi:[
-   ["principal","Loan amount","number"],
-   ["rate","Annual interest rate (%)","number"],
-   ["months","Loan term (months)","number"]
-  ],
-
-  compound:[
-   ["principal","Principal amount","number"],
-   ["rate","Annual interest rate (%)","number"],
-   ["years","Time (years)","number"],
-   ["times","Compounds per year","number"]
-  ],
-
-  simple:[
-   ["principal","Principal amount","number"],
-   ["rate","Interest rate (%)","number"],
-   ["years","Time (years)","number"]
-  ],
-
-  discount:[
-   ["price","Original price","number"],
-   ["discount","Discount (%)","number"]
-  ],
-
-  gst:[
-   ["price","Amount before GST","number"],
-   ["gst","GST rate (%)","number"]
-  ],
-
-  profit:[
-   ["cost","Cost price","number"],
-   ["sell","Selling price","number"]
-  ],
-
-  change:[
-   ["old","Old value","number"],
-   ["new","New value","number"]
-  ],
-
-  split:[
-   ["amount","Total amount","number"],
-   ["people","Number of people","number"]
-  ]
-
- }[type];
-
- $("financialBody").innerHTML=
- fields.map(f=>`
-
- <label>${f[1]}</label>
-
- <input
- class="input fin-input"
- id="fin-${f[0]}"
- type="${f[2]}"
- inputmode="decimal"
- min="0"
- placeholder="0">
-
- `).join("");
-
- $("financialResult").style.display="none";
-
- openModal("financialModal");
-}
-
-
-function calculateFinancial(){
-
- const val=k=>
- Number(
-  $("fin-"+k).value
- );
-
- let title="";
- let result="";
- let extra="";
-
- try{
-
-  if(financialType==="emi"){
-
-   const p=val("principal");
-   const r=val("rate")/1200;
-   const n=val("months");
-
-   if(!p||!n||r<0)throw Error();
-
-   const emi=
-   r===0
-   ?p/n
-   :p*r*Math.pow(1+r,n)/
-   (Math.pow(1+r,n)-1);
-
-   title="Monthly EMI";
-   result=money(emi);
-
-   extra=
-   `Total payment: ${money(emi*n)} · Total interest: ${money(emi*n-p)}`;
-  }
-
-
-  if(financialType==="compound"){
-
-   const p=val("principal");
-   const r=val("rate")/100;
-   const y=val("years");
-   const n=val("times")||1;
-
-   if(!p||!y||r<0)throw Error();
-
-   const a=
-   p*Math.pow(1+r/n,n*y);
-
-   title="Final amount";
-   result=money(a);
-
-   extra=
-   `Interest earned: ${money(a-p)}`;
-  }
-
-
-  if(financialType==="simple"){
-
-   const p=val("principal");
-   const r=val("rate")/100;
-   const y=val("years");
-
-   if(!p||y<0||r<0)throw Error();
-
-   const i=p*r*y;
-
-   title="Total amount";
-   result=money(p+i);
-
-   extra=
-   `Interest: ${money(i)}`;
-  }
-
-
-  if(financialType==="discount"){
-
-   const p=val("price");
-   const d=val("discount");
-
-   if(!p||d<0)throw Error();
-
-   const saving=p*d/100;
-
-   title="Sale price";
-   result=money(p-saving);
-
-   extra=
-   `You save: ${money(saving)}`;
-  }
-
-
-  if(financialType==="gst"){
-
-   const p=val("price");
-   const g=val("gst");
-
-   if(!p||g<0)throw Error();
-
-   const tax=p*g/100;
-
-   title="Final amount";
-   result=money(p+tax);
-
-   extra=
-   `GST: ${money(tax)}`;
-  }
-
-
-  if(financialType==="profit"){
-
-   const c=val("cost");
-   const s=val("sell");
-
-   if(!c||s<0)throw Error();
-
-   const diff=s-c;
-   const pct=diff/c*100;
-
-   title=
-   diff>=0
-   ?"Profit"
-   :"Loss";
-
-   result=
-   money(Math.abs(diff));
-
-   extra=
-   `${Math.abs(pct).toFixed(2)}% ${diff>=0?"profit":"loss"}`;
-  }
-
-
-  if(financialType==="change"){
-
-   const o=val("old");
-   const n=val("new");
-
-   if(!o||n<0)throw Error();
-
-   const pct=(n-o)/o*100;
-
-   title="Percentage change";
-
-   result=
-   (pct>=0?"+":"")+
-   pct.toFixed(2)+"%";
-
-   extra=
-   `Difference: ${n-o}`;
-  }
-
-
-  if(financialType==="split"){
-
-   const a=val("amount");
-   const p=val("people");
-
-   if(!a||!p||p<=0)throw Error();
-
-   title="Amount per person";
-
-   result=money(a/p);
-
-   extra=
-   `${p} people · Total: ${money(a)}`;
-  }
-
-
-  $("financialResult").style.display="block";
-
-  $("financialResult").innerHTML=`
-
-  <div class="card">
-
-   <div class="eyebrow">
-   ${title}
-   </div>
-
-   <div
-   class="stat-value green"
-   style="font-size:29px;margin:7px 0">
-   ${result}
-   </div>
-
-   <div class="stat-label">
-   ${extra}
-   </div>
-
-  </div>
-
-  `;
-
- }catch{
-
-  toast("Enter valid values");
- }
-}
-
-
-/* KEYBOARD CALCULATOR */
-
-document.addEventListener("keydown",e=>{
-
- if(
-  $("calculatorPage").classList.contains("active")
- ){
-
-  if(/[0-9.]/.test(e.key))
-   calcInput(e.key);
-
-  else if(e.key==="+")
-   calcInput("+");
-
-  else if(e.key==="-")
-   calcInput("−");
-
-  else if(e.key==="*")
-   calcInput("×");
-
-  else if(e.key==="/")
-   calcInput("÷");
-
-  else if(
-   e.key==="Enter"||
-   e.key==="="
-  )
-   calcEquals();
-
-  else if(e.key==="Backspace")
-   calcBackspace();
-
-  else if(e.key==="Escape")
-   calcClear();
- }
-});
-
-
-/* MODAL OUTSIDE TAP */
-
-document.querySelectorAll(".modal").forEach(m=>{
-
- m.addEventListener("click",e=>{
-
-  if(e.target===m){
-   closeModal(m.id);
-  }
-
- });
-});
-
-
-/* INITIALIZE */
-
-$("txDate").value=today();
-
-$("hideSwitch")
-.classList.toggle("on",state.hidden);
-
-$("currencySelect").value=
-state.currency||"₹";
-
-$("balance")
-.classList.toggle("hidden",state.hidden);
-
-$("privacyBtn").textContent=
-state.hidden?"◌":"◉";
+localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
 
 renderAll();
 
+}
 
-if("serviceWorker" in navigator){
+function money(v){
 
- window.addEventListener("load",()=>{
-
-  navigator.serviceWorker
-  .register("./service-worker.js")
-  .catch(()=>{});
-
- });
+return "₹"+Number(v||0).toLocaleString(
+"en-IN",
+{
+minimumFractionDigits:0,
+maximumFractionDigits:2
+}
+);
 
 }
+
+function esc(v){
+
+return String(v??"").replace(
+/[&<>"']/g,
+c=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
+}[c])
+);
+
+}
+
+function totals(){
+
+let income=0;
+let expense=0;
+
+data.transactions.forEach(t=>{
+
+if(t.type==="income")
+income+=Number(t.amount)||0;
+else
+expense+=Number(t.amount)||0;
+
+});
+
+return{
+income,
+expense,
+balance:income-expense
+};
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+function showPage(id){
+
+document.querySelectorAll(".page")
+.forEach(p=>p.classList.toggle("active",p.id===id));
+
+document.querySelectorAll(".nav")
+.forEach(n=>n.classList.toggle(
+"active",
+n.dataset.page===id
+));
+
+window.scrollTo({
+top:0,
+behavior:data.settings.animations?"smooth":"auto"
+});
+
+if(id==="activity")
+renderActivity();
+
+if(id==="savings")
+renderGoals();
+
+}
+
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+
+function openModal(id){
+document.getElementById(id).classList.add("show");
+}
+
+function closeModal(id){
+document.getElementById(id).classList.remove("show");
+}
+
+function backdrop(e,id){
+
+if(e.target.id===id)
+closeModal(id);
+
+}
+
+function toast(m){
+
+const e=document.getElementById("toast");
+
+e.textContent=m;
+e.classList.add("show");
+
+clearTimeout(window.toastTimer);
+
+window.toastTimer=setTimeout(
+()=>e.classList.remove("show"),
+2200
+);
+
+}
+
+
+/* =========================================================
+   TRANSACTIONS
+   ========================================================= */
+
+function openTransaction(type){
+
+transactionType=type;
+
+document.getElementById("txTitle").textContent=
+type==="income"
+?"Add Money"
+:"Add Expense";
+
+document.getElementById("txSave").textContent=
+type==="income"
+?"Save Money Added"
+:"Save Expense";
+
+document.getElementById("txAmount").value="";
+document.getElementById("txNote").value="";
+
+document.getElementById("txCategory").value=
+type==="income"
+?"General"
+:"Food";
+
+openModal("txModal");
+
+setTimeout(
+()=>document.getElementById("txAmount").focus(),
+150
+);
+
+}
+
+function saveTransaction(){
+
+const amount=Number(
+document.getElementById("txAmount").value
+);
+
+if(!Number.isFinite(amount)||amount<=0)
+return toast("Enter a valid amount");
+
+if(
+transactionType==="expense" &&
+amount>totals().balance
+)
+return toast("Expense is greater than your balance");
+
+data.transactions.push({
+
+id:uid(),
+
+type:transactionType,
+
+amount,
+
+category:
+document.getElementById("txCategory").value,
+
+note:
+document.getElementById("txNote").value.trim(),
+
+date:new Date().toISOString()
+
+});
+
+closeModal("txModal");
+
+saveData();
+
+toast(
+transactionType==="income"
+?"Money added"
+:"Expense recorded"
+);
+
+}
+
+function txIcon(c,t){
+
+if(t==="income")
+return"＋";
+
+return{
+Food:"🍴",
+Transport:"🚌",
+Shopping:"🛍️",
+Entertainment:"🎮",
+Education:"📚",
+Bills:"🧾",
+Savings:"◇",
+Gift:"🎁",
+Work:"💼",
+General:"₹",
+Other:"•"
+}[c]||"•";
+
+}
+
+function txHTML(t){
+
+return`
+<div class="transaction">
+
+<div class="txIcon">
+${txIcon(t.category,t.type)}
+</div>
+
+<div class="txMain">
+
+<div class="txName">
+${esc(t.note||t.category||"Transaction")}
+</div>
+
+<div class="txMeta">
+${esc(t.category||"General")} ·
+${new Date(t.date).toLocaleDateString("en-IN")}
+</div>
+
+</div>
+
+<div class="txAmount ${t.type==="income"?"green":"red"}">
+${t.type==="income"?"+":"−"}${money(t.amount)}
+</div>
+
+</div>
+`;
+
+}
+
+function renderRecent(){
+
+const a=[
+...data.transactions
+]
+.sort(
+(a,b)=>new Date(b.date)-new Date(a.date)
+)
+.slice(0,6);
+
+document.getElementById("recent").innerHTML=
+a.length
+?a.map(txHTML).join("")
+:`
+<div class="empty">
+No activity yet.<br>
+Add money or record an expense.
+</div>
+`;
+
+}
+
+function renderActivity(){
+
+const q=(
+document.getElementById("searchTx")?.value||""
+).toLowerCase();
+
+const a=[
+...data.transactions
+]
+.sort(
+(x,y)=>new Date(y.date)-new Date(x.date)
+)
+.filter(t=>
+`${t.note} ${t.category} ${t.amount}`
+.toLowerCase()
+.includes(q)
+);
+
+document.getElementById("activityCount").textContent=
+data.transactions.length+" transactions";
+
+document.getElementById("activityList").innerHTML=
+a.length
+?a.map(t=>`
+${txHTML(t)}
+
+<div style="
+display:flex;
+justify-content:flex-end;
+padding:5px 0 9px">
+
+<button
+class="smallBtn"
+onclick="deleteTransaction('${t.id}')">
+Delete
+</button>
+
+</div>
+`).join("")
+:`
+<div class="empty">
+No matching transactions.
+</div>
+`;
+
+}
+
+function deleteTransaction(id){
+
+ask(
+"Delete transaction?",
+"This transaction will be permanently removed.",
+()=>{
+
+data.transactions=
+data.transactions.filter(
+t=>t.id!==id
+);
+
+saveData();
+
+renderActivity();
+
+toast("Transaction deleted");
+
+}
+);
+
+}
+
+
+/* =========================================================
+   CASH WALLET
+   ========================================================= */
+
+function openCashWallet(){
+
+renderCashRows();
+openModal("cashModal");
+
+}
+
+function renderCashRows(){
+
+document.getElementById("notesRows").innerHTML=
+noteDenominations.map(d=>`
+
+<div class="moneyRow">
+
+<div class="denom">
+₹${d.toLocaleString("en-IN")}
+</div>
+
+<div style="font-size:10px;color:var(--muted)">
+
+<span
+id="noteDot${d}"
+class="present">
+</span>
+
+<span id="noteStatus${d}">
+None
+</span>
+
+</div>
+
+<input
+class="countInput"
+id="noteCount${d}"
+type="number"
+min="0"
+step="1"
+inputmode="numeric"
+value="${data.cash.notes[d]||0}"
+oninput="updateCashPreview()">
+
+<div
+class="rowTotal"
+id="noteTotal${d}">
+₹0
+</div>
+
+</div>
+
+`).join("");
+
+document.getElementById("coinsRows").innerHTML=
+coinDenominations.map(d=>`
+
+<div class="moneyRow">
+
+<div class="denom">
+₹${d}
+</div>
+
+<div style="font-size:10px;color:var(--muted)">
+
+<span
+id="coinDot${d}"
+class="present">
+</span>
+
+<span id="coinStatus${d}">
+None
+</span>
+
+</div>
+
+<input
+class="countInput"
+id="coinCount${d}"
+type="number"
+min="0"
+step="1"
+inputmode="numeric"
+value="${data.cash.coins[d]||0}"
+oninput="updateCashPreview()">
+
+<div
+class="rowTotal"
+id="coinTotal${d}">
+₹0
+</div>
+
+</div>
+
+`).join("");
+
+updateCashPreview();
+
+}
+
+function getCashValues(){
+
+const notes={};
+const coins={};
+
+noteDenominations.forEach(d=>
+notes[d]=Math.max(
+0,
+Math.floor(
+Number(
+document.getElementById("noteCount"+d)?.value
+)||0
+)
+)
+);
+
+coinDenominations.forEach(d=>
+coins[d]=Math.max(
+0,
+Math.floor(
+Number(
+document.getElementById("coinCount"+d)?.value
+)||0
+)
+)
+);
+
+return{notes,coins};
+
+}
+
+function updateCashPreview(){
+
+let nt=0;
+let ct=0;
+
+noteDenominations.forEach(d=>{
+
+const c=Math.max(
+0,
+Math.floor(
+Number(
+document.getElementById("noteCount"+d)?.value
+)||0
+)
+);
+
+const t=d*c;
+
+nt+=t;
+
+document.getElementById("noteTotal"+d)
+.textContent=money(t);
+
+document.getElementById("noteDot"+d)
+.classList.toggle("yes",c>0);
+
+document.getElementById("noteStatus"+d)
+.textContent=
+c
+?`${c} note${c===1?"":"s"}`
+:"None";
+
+});
+
+coinDenominations.forEach(d=>{
+
+const c=Math.max(
+0,
+Math.floor(
+Number(
+document.getElementById("coinCount"+d)?.value
+)||0
+)
+);
+
+const t=d*c;
+
+ct+=t;
+
+document.getElementById("coinTotal"+d)
+.textContent=money(t);
+
+document.getElementById("coinDot"+d)
+.classList.toggle("yes",c>0);
+
+document.getElementById("coinStatus"+d)
+.textContent=
+c
+?`${c} coin${c===1?"":"s"}`
+:"None";
+
+});
+
+document.getElementById("cashNotesSummary")
+.textContent=money(nt);
+
+document.getElementById("cashCoinsSummary")
+.textContent=money(ct);
+
+document.getElementById("cashGrandTotal")
+.textContent=money(nt+ct);
+
+}
+
+function saveCashWallet(){
+
+const v=getCashValues();
+
+data.cash=v;
+
+saveData();
+
+closeModal("cashModal");
+
+toast("Cash wallet saved");
+
+}
+
+function clearCashFields(){
+
+ask(
+"Clear cash wallet?",
+"All saved note and coin counts will be set to zero.",
+()=>{
+
+noteDenominations.forEach(d=>
+document.getElementById("noteCount"+d).value=0
+);
+
+coinDenominations.forEach(d=>
+document.getElementById("coinCount"+d).value=0
+);
+
+updateCashPreview();
+
+}
+);
+
+}
+
+
+/* =========================================================
+   SAVINGS GOALS
+   ========================================================= */
+
+function openGoal(){
+
+editingGoal=null;
+
+document.getElementById("goalTitle")
+.textContent="New Savings Goal";
+
+[
+"goalName",
+"goalTarget",
+"goalSaved",
+"goalDate"
+].forEach(
+id=>document.getElementById(id).value=""
+);
+
+openModal("goalModal");
+
+}
+
+function editGoal(id){
+
+const g=data.goals.find(x=>x.id===id);
+
+if(!g)return;
+
+editingGoal=id;
+
+document.getElementById("goalTitle")
+.textContent="Edit Savings Goal";
+
+document.getElementById("goalName").value=g.name;
+document.getElementById("goalTarget").value=g.target;
+document.getElementById("goalSaved").value=g.saved;
+document.getElementById("goalDate").value=g.date||"";
+
+openModal("goalModal");
+
+}
+
+function saveGoal(){
+
+const name=
+document.getElementById("goalName")
+.value.trim();
+
+const target=
+Number(
+document.getElementById("goalTarget").value
+);
+
+const saved=
+Number(
+document.getElementById("goalSaved").value
+)||0;
+
+const date=
+document.getElementById("goalDate").value;
+
+if(!name)
+return toast("Enter a goal name");
+
+if(!Number.isFinite(target)||target<=0)
+return toast("Enter a valid target");
+
+if(saved<0)
+return toast("Saved amount cannot be negative");
+
+if(editingGoal){
+
+const g=
+data.goals.find(x=>x.id===editingGoal);
+
+if(g){
+
+g.name=name;
+g.target=target;
+g.saved=saved;
+g.date=date;
+
+}
+
+}else{
+
+data.goals.push({
+id:uid(),
+name,
+target,
+saved,
+date
+});
+
+}
+
+closeModal("goalModal");
+
+saveData();
+
+toast("Savings goal saved");
+
+}
+
+function renderGoals(){
+
+const html=
+data.goals.length
+?data.goals.map(g=>{
+
+const p=
+Math.min(
+100,
+(Number(g.saved)/Number(g.target))*100||0
+);
+
+return`
+
+<div class="card goal">
+
+<div class="goalTop">
+
+<b>${esc(g.name)}</b>
+
+<span>${p.toFixed(0)}%</span>
+
+</div>
+
+<div class="progress">
+<i style="width:${p}%"></i>
+</div>
+
+<div class="goalBottom">
+
+<span>
+${money(g.saved)}
+of
+${money(g.target)}
+</span>
+
+<span>
+${g.date
+?"Due "+new Date(g.date+"T00:00:00")
+.toLocaleDateString("en-IN")
+:""}
+</span>
+
+</div>
+
+<div class="goalActions">
+
+<button
+class="smallBtn"
+onclick="addToGoal('${g.id}')">
+＋ Add
+</button>
+
+<button
+class="smallBtn"
+onclick="editGoal('${g.id}')">
+Edit
+</button>
+
+<button
+class="smallBtn"
+onclick="deleteGoal('${g.id}')">
+Delete
+</button>
+
+</div>
+
+</div>
+
+`;
+
+}).join("")
+:`
+<div class="empty">
+No savings goals yet.
+</div>
+`;
+
+document.getElementById("goals").innerHTML=html;
+document.getElementById("allGoals").innerHTML=html;
+
+}
+
+function addToGoal(id){
+
+const g=data.goals.find(x=>x.id===id);
+
+if(!g)return;
+
+openNumberInput(
+"Add to "+g.name,
+"Enter the amount you want to add to this savings goal.",
+amount=>{
+
+if(amount>totals().balance)
+return toast("Not enough available balance");
+
+g.saved+=amount;
+
+saveData();
+
+toast("Savings goal updated");
+
+}
+);
+
+}
+
+function deleteGoal(id){
+
+ask(
+"Delete savings goal?",
+"This goal and its saved progress will be permanently removed.",
+()=>{
+
+data.goals=
+data.goals.filter(g=>g.id!==id);
+
+saveData();
+
+toast("Savings goal deleted");
+
+}
+);
+
+}
+
+
+/* =========================================================
+   CONFIRMATION
+   ========================================================= */
+
+function ask(title,text,callback){
+
+if(!data.settings.confirm)
+return callback();
+
+document.getElementById("confirmTitle")
+.textContent=title;
+
+document.getElementById("confirmText")
+.textContent=text;
+
+pendingConfirm=callback;
+
+document.getElementById("confirmYes").onclick=()=>{
+
+const a=pendingConfirm;
+
+pendingConfirm=null;
+
+closeModal("confirmModal");
+
+if(a)a();
+
+};
+
+openModal("confirmModal");
+
+}
+
+
+/* =========================================================
+   NUMBER INPUT
+   ========================================================= */
+
+function openNumberInput(
+title,
+description,
+callback
+){
+
+pendingInputResolve=callback;
+
+document.getElementById("inputTitle")
+.textContent=title;
+
+document.getElementById("inputDescription")
+.textContent=description;
+
+document.getElementById("inputAmount")
+.value="";
+
+openModal("inputModal");
+
+setTimeout(
+()=>document.getElementById("inputAmount").focus(),
+150
+);
+
+}
+
+function submitInput(){
+
+const a=
+Number(
+document.getElementById("inputAmount").value
+);
+
+if(!Number.isFinite(a)||a<=0)
+return toast("Enter a valid amount");
+
+const cb=pendingInputResolve;
+
+pendingInputResolve=null;
+
+closeModal("inputModal");
+
+if(cb)cb(a);
+
+}
+
+function cancelInput(){
+
+pendingInputResolve=null;
+
+closeModal("inputModal");
+
+}
+
+
+/* =========================================================
+   CALCULATOR
+   ========================================================= */
+
+let calcValue="";
+let calcExpression="";
+
+function calcInput(v){
+
+if(v==="AC")
+return calcClear();
+
+if(v==="⌫"){
+
+calcValue=calcValue.slice(0,-1);
+
+return updateCalc();
+
+}
+
+calcValue+=v;
+
+updateCalc();
+
+}
+
+function calcClear(){
+
+calcValue="";
+calcExpression="";
+
+updateCalc();
+
+}
+
+function calcEquals(){
+
+try{
+
+let e=
+calcValue
+.replace(/×/g,"*")
+.replace(/÷/g,"/")
+.replace(/−/g,"-")
+.replace(
+/(\d+(?:\.\d+)?)%/g,
+"($1/100)"
+);
+
+if(!/^[0-9+\-*/().\s]+$/.test(e))
+throw 0;
+
+const r=
+Function(
+'"use strict";return ('+e+')'
+)();
+
+if(!Number.isFinite(r))
+throw 0;
+
+calcExpression=calcValue+" =";
+
+calcValue=
+String(
+Number(
+r.toFixed(10)
+)
+);
+
+updateCalc();
+
+}catch{
+
+calcExpression="Invalid expression";
+calcValue="0";
+
+updateCalc();
+
+}
+
+}
+
+function updateCalc(){
+
+document.getElementById("calcExpr")
+.textContent=calcExpression;
+
+document.getElementById("calcResult")
+.textContent=calcValue||"0";
+
+}
+
+document.addEventListener("keydown",e=>{
+
+if(
+!document
+.getElementById("calculator")
+.classList.contains("active")
+)return;
+
+if(/[0-9.+\-*/%]/.test(e.key))
+
+calcInput(
+e.key==="*"
+?"×"
+:e.key==="/"
+?"÷"
+:e.key
+);
+
+else if(e.key==="Enter")
+calcEquals();
+
+else if(e.key==="Backspace")
+calcInput("⌫");
+
+else if(e.key==="Escape")
+calcClear();
+
+});
+
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+
+function toggleSetting(s){
+
+data.settings[s]=!data.settings[s];
+
+saveData();
+
+toast(
+s==="animations"
+?"Animations "+(
+data.settings[s]
+?"enabled"
+:"disabled"
+)
+:"Confirmations "+(
+data.settings[s]
+?"enabled"
+:"disabled"
+)
+);
+
+}
+
+
+/* =========================================================
+   EXPORT / IMPORT
+   ========================================================= */
+
+function exportData(){
+
+const backup={
+app:"Pocki",
+format:8,
+exportedAt:new Date().toISOString(),
+data
+};
+
+const blob=
+new Blob(
+[JSON.stringify(backup,null,2)],
+{type:"application/json"}
+);
+
+const url=
+URL.createObjectURL(blob);
+
+const a=document.createElement("a");
+
+a.href=url;
+a.download="pocki-backup.json";
+
+document.body.appendChild(a);
+
+a.click();
+
+a.remove();
+
+setTimeout(
+()=>URL.revokeObjectURL(url),
+1000
+);
+
+toast("Backup exported");
+
+}
+
+function importData(e){
+
+const file=e.target.files[0];
+
+if(!file)return;
+
+const reader=new FileReader();
+
+reader.onload=()=>{
+
+try{
+
+const parsed=
+JSON.parse(reader.result);
+
+const i=
+parsed.data||parsed;
+
+if(
+!i||
+!Array.isArray(i.transactions)||
+!Array.isArray(i.goals)
+)
+throw 0;
+
+ask(
+"Import backup?",
+"Your current Pocki data will be replaced by this backup.",
+()=>{
+
+data={
+...clone(DEFAULT_DATA),
+...i,
+
+transactions:i.transactions,
+
+goals:i.goals,
+
+cash:{
+notes:{
+...DEFAULT_DATA.cash.notes,
+...(i.cash?.notes||{})
+},
+
+coins:{
+...DEFAULT_DATA.cash.coins,
+...(i.cash?.coins||{})
+}
+},
+
+settings:{
+...DEFAULT_DATA.settings,
+...(i.settings||{})
+},
+
+security:{
+enabled:!!i.security?.enabled,
+
+sequence:
+Array.isArray(i.security?.sequence)
+?i.security.sequence
+.map(Number)
+.filter(
+n=>Number.isInteger(n)&&
+n>=0&&
+n<TOTAL_NUMBERS
+)
+:[]
+}
+
+};
+
+saveData();
+
+toast("Backup imported");
+
+}
+);
+
+}catch{
+
+toast("Invalid Pocki backup");
+
+}
+
+};
+
+reader.readAsText(file);
+
+e.target.value="";
+
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+function resetData(){
+
+ask(
+"Reset all Pocki data?",
+"All transactions, goals, cash counts and vault security settings will be permanently deleted.",
+()=>{
+
+data=clone(DEFAULT_DATA);
+
+saveData();
+
+unlockPocki();
+
+toast("All Pocki data reset");
+
+}
+);
+
+}
+
+
+/* =========================================================
+   VAULT ENGINE
+   =========================================================
+
+   IMPORTANT:
+
+   - 50 numbers: 0–49
+   - NO NUMBERS ARE DRAWN ON THE WHEEL
+   - NUMBER IS DISPLAYED OUTSIDE THE WHEEL
+   - DRAGGING IS FULLY ROTATABLE
+   - RELEASE SNAPS TO THE NEAREST NUMBER
+   - CORRECT = GREEN
+   - WRONG = RED
+   - SELECTED NUMBERS ARE NEVER DISPLAYED AS A SEQUENCE
+   - NO DEFAULT PASSWORD
+*/
+
+
+const vaultLock=
+document.getElementById("vaultLock");
+
+const vaultWheel=
+document.getElementById("lockWheel");
+
+const vaultStatus=
+document.getElementById("lockStatus");
+
+const liveNumber=
+document.getElementById("liveNumber");
+
+const vaultLight=
+document.getElementById("vaultLight");
+
+
+/* LOCK STATE */
+
+const vaultState={
+rotation:0,
+dragging:false,
+lastPointerAngle:0,
+currentNumber:0,
+settling:false
+};
+
+let vaultEntered=[];
+
+
+/* SETUP STATE */
+
+const setupWheel=
+document.getElementById("setupWheel");
+
+const setupLiveNumber=
+document.getElementById("setupLiveNumber");
+
+const setupState={
+rotation:0,
+dragging:false,
+lastPointerAngle:0,
+currentNumber:0,
+settling:false
+};
+
+let setupSequence=[];
+
+
+/* =========================================================
+   POINTER ANGLE
+   ========================================================= */
+
+function pointerAngle(element,event){
+
+const rect=
+element.getBoundingClientRect();
+
+const cx=
+rect.left+
+rect.width/2;
+
+const cy=
+rect.top+
+rect.height/2;
+
+return Math.atan2(
+event.clientY-cy,
+event.clientX-cx
+)*180/Math.PI;
+
+}
+
+
+/* =========================================================
+   NORMALIZE
+   ========================================================= */
+
+function normalizeAngle(a){
+
+return(
+(a%360)+360
+)%360;
+
+}
+
+
+/* =========================================================
+   NUMBER FROM ROTATION
+   =========================================================
+
+   Pointer is fixed at the top.
+
+   The wheel has 50 logical positions.
+   Rotation is converted directly into the
+   number sitting beneath the pointer.
+*/
+
+function numberFromRotation(rotation){
+
+const normalized=
+normalizeAngle(-rotation);
+
+return Math.round(
+normalized/WHEEL_STEP
+)%TOTAL_NUMBERS;
+
+}
+
+
+/* =========================================================
+   LIVE NUMBER
+   ========================================================= */
+
+function updateVaultLiveNumber(){
+
+const n=
+numberFromRotation(vaultState.rotation);
+
+vaultState.currentNumber=n;
+
+liveNumber.textContent=n;
+
+}
+
+function updateSetupLiveNumber(){
+
+const n=
+numberFromRotation(setupState.rotation);
+
+setupState.currentNumber=n;
+
+setupLiveNumber.textContent=n;
+
+}
+
+
+/* =========================================================
+   START VAULT DRAG
+   ========================================================= */
+
+vaultWheel.addEventListener(
+"pointerdown",
+event=>{
+
+if(vaultState.settling)
+return;
+
+event.preventDefault();
+
+vaultState.dragging=true;
+
+vaultWheel.setPointerCapture(
+event.pointerId
+);
+
+vaultState.lastPointerAngle=
+pointerAngle(
+vaultWheel,
+event
+);
+
+vaultWheel.style.transition="none";
+
+vaultWheel.style.cursor="grabbing";
+
+}
+);
+
+
+/* =========================================================
+   VAULT DRAG
+   ========================================================= */
+
+vaultWheel.addEventListener(
+"pointermove",
+event=>{
+
+if(!vaultState.dragging)
+return;
+
+event.preventDefault();
+
+const angle=
+pointerAngle(
+vaultWheel,
+event
+);
+
+let delta=
+angle-vaultState.lastPointerAngle;
+
+if(delta>180)
+delta-=360;
+
+if(delta<-180)
+delta+=360;
+
+vaultState.rotation+=delta;
+
+vaultState.lastPointerAngle=angle;
+
+vaultWheel.style.transform=
+`rotate(${vaultState.rotation}deg)`;
+
+updateVaultLiveNumber();
+
+}
+);
+
+
+/* =========================================================
+   STOP VAULT DRAG
+   ========================================================= */
+
+function stopVaultDragging(){
+
+if(!vaultState.dragging)
+return;
+
+vaultState.dragging=false;
+
+vaultWheel.style.cursor="grab";
+
+selectVaultNumber();
+
+}
+
+vaultWheel.addEventListener(
+"pointerup",
+stopVaultDragging
+);
+
+vaultWheel.addEventListener(
+"pointercancel",
+stopVaultDragging
+);
+
+
+/* =========================================================
+   SNAP VAULT WHEEL
+   ========================================================= */
+
+function snapVaultToNumber(n){
+
+const targetRotation=
+-n*WHEEL_STEP;
+
+vaultState.rotation=targetRotation;
+
+vaultWheel.style.transition=
+"transform .28s cubic-bezier(.2,.8,.2,1)";
+
+vaultWheel.style.transform=
+`rotate(${targetRotation}deg)`;
+
+liveNumber.textContent=n;
+
+}
+
+
+/* =========================================================
+   SELECT VAULT NUMBER
+   ========================================================= */
+
+function selectVaultNumber(){
+
+if(vaultState.settling)
+return;
+
+if(!data.security.enabled||
+!data.security.sequence.length)
+return;
+
+vaultState.settling=true;
+
+const n=
+numberFromRotation(
+vaultState.rotation
+);
+
+vaultState.currentNumber=n;
+
+snapVaultToNumber(n);
+
+const expected=
+data.security.sequence[
+vaultEntered.length
+];
+
+const correct=
+n===expected;
+
+if(correct){
+
+vaultEntered.push(n);
+
+liveNumber.className=
+"liveNumber correct";
+
+showVaultLight("green");
+
+vaultStatus.textContent=
+"Correct";
+
+vaultStatus.className=
+"lockStatus success";
+
+if(
+vaultEntered.length===
+data.security.sequence.length
+){
+
+setTimeout(
+unlockPocki,
+600
+);
+
+return;
+
+}
+
+}else{
+
+liveNumber.className=
+"liveNumber wrong";
+
+showVaultLight("red");
+
+vaultStatus.textContent=
+"Wrong number";
+
+vaultStatus.className=
+"lockStatus error";
+
+setTimeout(
+resetVaultAfterWrong,
+650
+);
+
+return;
+
+}
+
+
+/* Correct intermediate number */
+
+setTimeout(()=>{
+
+vaultState.rotation=0;
+
+vaultWheel.style.transition=
+"transform .28s ease";
+
+vaultWheel.style.transform=
+"rotate(0deg)";
+
+liveNumber.textContent="0";
+
+liveNumber.className=
+"liveNumber";
+
+showVaultLight("neutral");
+
+vaultStatus.textContent=
+"Next number";
+
+vaultStatus.className=
+"lockStatus";
+
+vaultState.settling=false;
+
+},500);
+
+}
+
+
+/* =========================================================
+   WRONG VAULT NUMBER
+   ========================================================= */
+
+function resetVaultAfterWrong(){
+
+vaultEntered=[];
+
+vaultState.rotation=0;
+
+vaultWheel.style.transition=
+"transform .28s ease";
+
+vaultWheel.style.transform=
+"rotate(0deg)";
+
+liveNumber.textContent="0";
+
+liveNumber.className=
+"liveNumber";
+
+showVaultLight("neutral");
+
+vaultStatus.textContent=
+"Try again";
+
+vaultStatus.className=
+"lockStatus";
+
+vaultState.settling=false;
+
+}
+
+
+/* =========================================================
+   UNDO
+   ========================================================= */
+
+function vaultUndo(){
+
+if(vaultState.settling)
+return;
+
+if(!vaultEntered.length){
+
+vaultStatus.textContent=
+"Nothing to undo";
+
+return;
+
+}
+
+vaultEntered.pop();
+
+vaultState.rotation=0;
+
+vaultWheel.style.transition=
+"transform .25s ease";
+
+vaultWheel.style.transform=
+"rotate(0deg)";
+
+liveNumber.textContent="0";
+
+liveNumber.className=
+"liveNumber";
+
+showVaultLight("neutral");
+
+vaultStatus.textContent=
+"Last selection removed";
+
+vaultStatus.className=
+"lockStatus";
+
+}
+
+
+/* =========================================================
+   LIGHT
+   ========================================================= */
+
+function showVaultLight(color){
+
+if(color==="green"){
+
+vaultLight.style.background=
+"#7dffb2";
+
+vaultLight.style.boxShadow=
+"0 0 18px #7dffb2,0 0 35px rgba(125,255,178,.45)";
+
+}else if(color==="red"){
+
+vaultLight.style.background=
+"#ff7185";
+
+vaultLight.style.boxShadow=
+"0 0 18px #ff7185,0 0 35px rgba(255,113,133,.45)";
+
+}else{
+
+vaultLight.style.background=
+"#303540";
+
+vaultLight.style.boxShadow=
+"none";
+
+}
+
+}
+
+
+/* =========================================================
+   SHOW VAULT
+   ========================================================= */
+
+function showVaultLock(){
+
+if(
+!data.security.enabled||
+!Array.isArray(data.security.sequence)||
+!data.security.sequence.length
+)
+return;
+
+vaultEntered=[];
+
+vaultState.rotation=0;
+vaultState.dragging=false;
+vaultState.settling=false;
+
+vaultWheel.style.transition="none";
+vaultWheel.style.transform="rotate(0deg)";
+
+liveNumber.textContent="0";
+liveNumber.className="liveNumber";
+
+showVaultLight("neutral");
+
+vaultStatus.textContent=
+"Drag the wheel with your finger.";
+
+vaultStatus.className=
+"lockStatus";
+
+vaultLock.classList.add("show");
+
+}
+
+
+/* =========================================================
+   UNLOCK
+   ========================================================= */
+
+function unlockPocki(){
+
+vaultLock.classList.remove("show");
+
+vaultEntered=[];
+
+vaultState.rotation=0;
+vaultState.dragging=false;
+vaultState.settling=false;
+
+vaultWheel.style.transition=
+"none";
+
+vaultWheel.style.transform=
+"rotate(0deg)";
+
+liveNumber.textContent="0";
+liveNumber.className="liveNumber";
+
+showVaultLight("neutral");
+
+vaultStatus.textContent=
+"Drag the wheel with your finger.";
+
+vaultStatus.className=
+"lockStatus";
+
+}
+
+
+/* =========================================================
+   MANUAL LOCK
+   ========================================================= */
+
+function lockApp(){
+
+if(
+!data.security.enabled||
+!data.security.sequence.length
+){
+
+toast("Create a vault passcode first");
+
+return;
+
+}
+
+showVaultLock();
+
+}
+
+
+/* =========================================================
+   VAULT SETUP
+   ========================================================= */
+
+function openLockSetup(){
+
+setupSequence=[];
+
+setupState.rotation=0;
+setupState.dragging=false;
+setupState.settling=false;
+setupState.currentNumber=0;
+
+setupWheel.style.transition="none";
+setupWheel.style.transform="rotate(0deg)";
+
+setupLiveNumber.textContent="0";
+
+renderSetupDots();
+
+document.getElementById("setupTitle")
+.textContent=
+data.security.enabled
+?"Change Vault Passcode"
+:"Create Vault Passcode";
+
+openModal("lockSetupModal");
+
+}
+
+function closeLockSetup(){
+
+closeModal("lockSetupModal");
+
+setupSequence=[];
+
+setupState.rotation=0;
+
+setupWheel.style.transform=
+"rotate(0deg)";
+
+}
+
+
+/* =========================================================
+   SETUP DRAG
+   ========================================================= */
+
+setupWheel.addEventListener(
+"pointerdown",
+event=>{
+
+if(setupState.settling)
+return;
+
+event.preventDefault();
+
+setupState.dragging=true;
+
+setupWheel.setPointerCapture(
+event.pointerId
+);
+
+setupState.lastPointerAngle=
+pointerAngle(
+setupWheel,
+event
+);
+
+setupWheel.style.transition="none";
+
+setupWheel.style.cursor="grabbing";
+
+}
+);
+
+setupWheel.addEventListener(
+"pointermove",
+event=>{
+
+if(!setupState.dragging)
+return;
+
+event.preventDefault();
+
+const angle=
+pointerAngle(
+setupWheel,
+event
+);
+
+let delta=
+angle-setupState.lastPointerAngle;
+
+if(delta>180)
+delta-=360;
+
+if(delta<-180)
+delta+=360;
+
+setupState.rotation+=delta;
+
+setupState.lastPointerAngle=angle;
+
+setupWheel.style.transform=
+`rotate(${setupState.rotation}deg)`;
+
+updateSetupLiveNumber();
+
+}
+);
+
+function stopSetupDragging(){
+
+if(!setupState.dragging)
+return;
+
+setupState.dragging=false;
+
+setupWheel.style.cursor="grab";
+
+selectSetupNumber();
+
+}
+
+setupWheel.addEventListener(
+"pointerup",
+stopSetupDragging
+);
+
+setupWheel.addEventListener(
+"pointercancel",
+stopSetupDragging
+);
+
+
+/* =========================================================
+   SETUP SELECT
+   ========================================================= */
+
+function selectSetupNumber(){
+
+if(setupState.settling)
+return;
+
+if(setupSequence.length>=8)
+return;
+
+setupState.settling=true;
+
+const n=
+numberFromRotation(
+setupState.rotation
+);
+
+setupState.currentNumber=n;
+
+setupState.rotation=
+-n*WHEEL_STEP;
+
+setupWheel.style.transition=
+"transform .28s cubic-bezier(.2,.8,.2,1)";
+
+setupWheel.style.transform=
+`rotate(${setupState.rotation}deg)`;
+
+setupLiveNumber.textContent=n;
+
+setTimeout(()=>{
+
+setupSequence.push(n);
+
+renderSetupDots();
+
+setupState.rotation=0;
+
+setupWheel.style.transition=
+"transform .28s ease";
+
+setupWheel.style.transform=
+"rotate(0deg)";
+
+setupLiveNumber.textContent="0";
+
+setupState.settling=false;
+
+},400);
+
+}
+
+
+/* =========================================================
+   SETUP DOTS
+   ========================================================= */
+
+function renderSetupDots(){
+
+const holder=
+document.getElementById("sequenceDots");
+
+holder.innerHTML="";
+
+const max=8;
+
+for(let i=0;i<max;i++){
+
+const dot=
+document.createElement("div");
+
+dot.className=
+"sequenceDot"+
+(i<setupSequence.length
+?" filled"
+:"");
+
+holder.appendChild(dot);
+
+}
+
+}
+
+
+/* =========================================================
+   SETUP UNDO
+   ========================================================= */
+
+function setupUndo(){
+
+if(setupState.settling)
+return;
+
+if(!setupSequence.length)
+return toast("Nothing to undo");
+
+setupSequence.pop();
+
+renderSetupDots();
+
+setupLiveNumber.textContent="0";
+
+}
+
+
+/* =========================================================
+   SETUP CLEAR
+   ========================================================= */
+
+function setupClear(){
+
+if(setupState.settling)
+return;
+
+setupSequence=[];
+
+renderSetupDots();
+
+setupState.rotation=0;
+
+setupWheel.style.transition=
+"transform .2s ease";
+
+setupWheel.style.transform=
+"rotate(0deg)";
+
+setupLiveNumber.textContent="0";
+
+}
+
+
+/* =========================================================
+   SAVE NEW PASSWORD
+   ========================================================= */
+
+function finishLockSetup(){
+
+if(setupSequence.length<1){
+
+toast("Choose at least one number");
+
+return;
+
+}
+
+data.security={
+enabled:true,
+sequence:[...setupSequence]
+};
+
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify(data)
+);
+
+closeLockSetup();
+
+updateSecurityUI();
+
+toast("Vault passcode saved");
+
+}
+
+
+/* =========================================================
+   REMOVE PASSCODE
+   ========================================================= */
+
+function removeVaultPasscode(){
+
+ask(
+"Remove vault passcode?",
+"Pocki will no longer require the wheel combination to unlock.",
+()=>{
+
+data.security={
+enabled:false,
+sequence:[]
+};
+
+saveData();
+
+toast("Vault passcode removed");
+
+}
+);
+
+}
+
+
+/* =========================================================
+   SECURITY UI
+   ========================================================= */
+
+function updateSecurityUI(){
+
+const text=
+document.getElementById(
+"securityButtonText"
+);
+
+const lockButton=
+document.getElementById(
+"lockNowButton"
+);
+
+if(data.security.enabled){
+
+text.textContent=
+"Change Vault Passcode";
+
+lockButton.style.display=
+"block";
+
+}else{
+
+text.textContent=
+"Create Vault Passcode";
+
+lockButton.style.display=
+"none";
+
+}
+
+}
+
+
+/* =========================================================
+   MAIN RENDER
+   ========================================================= */
+
+function renderAll(){
+
+const t=totals();
+
+document.getElementById("balance")
+.textContent=
+t.balance.toLocaleString(
+"en-IN",
+{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+}
+);
+
+document.getElementById("incomeStat")
+.textContent=money(t.income);
+
+document.getElementById("expenseStat")
+.textContent=money(t.expense);
+
+document.getElementById("txCount")
+.textContent=data.transactions.length;
+
+const now=new Date();
+
+let mi=0;
+let me=0;
+
+data.transactions.forEach(x=>{
+
+const d=new Date(x.date);
+
+if(
+d.getMonth()===now.getMonth()&&
+d.getFullYear()===now.getFullYear()
+){
+
+if(x.type==="income")
+mi+=Number(x.amount)||0;
+else
+me+=Number(x.amount)||0;
+
+}
+
+});
+
+document.getElementById("monthStat")
+.textContent=money(mi-me);
+
+document.getElementById("saveAvailable")
+.textContent=money(
+Math.max(0,t.balance)
+);
+
+renderRecent();
+renderGoals();
+
+if(
+document
+.getElementById("activity")
+.classList.contains("active")
+)
+renderActivity();
+
+document.getElementById("animToggle")
+.classList.toggle(
+"on",
+!!data.settings.animations
+);
+
+document.getElementById("confirmToggle")
+.classList.toggle(
+"on",
+!!data.settings.confirm
+);
+
+updateSecurityUI();
+
+}
+
+
+/* =========================================================
+   INITIALIZATION
+   ========================================================= */
+
+renderSetupDots();
+
+renderAll();
+
+updateCalc();
+
+updateVaultLiveNumber();
+
+updateSetupLiveNumber();
+
+/*
+   IMPORTANT:
+   Pocki DOES NOT automatically create a password.
+
+   If there is no security sequence:
+       app opens normally.
+
+   If the user has created a sequence:
+       app still opens normally.
+
+   The vault only appears when:
+       Settings → Lock Pocki Now
+
+   Therefore there is never an unexpected
+   default password or automatic lock.
+*/
 
 </script>
 
 </body>
-</html>
+ </html>
