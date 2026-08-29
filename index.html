@@ -99,7 +99,7 @@ input:focus,select:focus{border-color:var(--accent)}.formRow{display:grid;grid-t
 <div class="wheel" id="lockWheel"><div class="wheelCenter">🔒</div></div>
 </div>
 <div class="liveNumber" id="liveNumber">0</div>
-<div class="wheelInstruction">LIVE NUMBER</div>
+<div class="wheelInstruction"></div>
 <div class="vaultButtons">
 <button class="vaultBtn" onclick="vaultUndo()">UNDO</button>
 </div>
@@ -237,13 +237,13 @@ input:focus,select:focus{border-color:var(--accent)}.formRow{display:grid;grid-t
 <!-- VAULT SETUP -->
 <div id="lockSetupModal" class="modal"><div class="sheet">
 <div class="sheetHead"><h2 id="setupTitle">Create Vault Passcode</h2><button class="close" onclick="closeModal('lockSetupModal')">×</button></div>
-<div style="color:var(--muted);font-size:11px;line-height:1.5">Choose a sequence by rotating the wheel. Release the wheel to select its live number. The selected numbers stay hidden.</div>
+<div style="color:var(--muted);font-size:11px;line-height:1.5">Choose a sequence by rotating the wheel. Release the wheel to select its live number.</div>
 <div class="setupWheel" id="setupAssembly">
 <div class="lockOuter"></div><div class="lockPointer"></div>
 <div class="wheel" id="setupWheel"><div class="wheelCenter">🔒</div></div>
 </div>
 <div class="setupLive" id="setupLive">0</div>
-<div class="wheelInstruction">LIVE NUMBER</div>
+<div class="wheelInstruction"></div>
 <div class="sequenceDots" id="sequenceDots"></div>
 <div id="setupStatus" class="lockStatus">Choose the first number.</div>
 <div class="formRow" style="margin-top:16px">
@@ -709,28 +709,6 @@ function resetData(){
    WHEEL ENGINE
    ========================= */
 
-function createWheelNumbers(wheel){
- wheel.querySelectorAll(".wheelTick").forEach(x=>x.remove());
-
- for(let i=0;i<TOTAL_NUMBERS;i++){
-  const tick=document.createElement("div");
-  const angle=i*WHEEL_STEP;
-  tick.className="wheelTick";
-  tick.style.cssText=`
-   position:absolute;
-   left:50%;
-   top:7px;
-   width:${i%5===0?3:2}px;
-   height:${i%5===0?18:12}px;
-   background:${i%5===0?"#d5dadd":"#9da5a9"};
-   transform-origin:50% 102px;
-   transform:translateX(-50%) rotate(${angle}deg);
-   border-radius:3px;
-   pointer-events:none;
-  `;
-  wheel.appendChild(tick);
- }
-}
 
 function pointerAngle(event,wheel){
  const r=wheel.getBoundingClientRect();
@@ -789,8 +767,6 @@ function endWheelDrag(wheel,state,callback){
 const lockWheel=document.getElementById("lockWheel");
 const setupWheel=document.getElementById("setupWheel");
 
-createWheelNumbers(lockWheel);
-createWheelNumbers(setupWheel);
 
 lockWheel.addEventListener("pointerdown",e=>beginWheelDrag(e,lockWheel,vault,document.getElementById("liveNumber")));
 lockWheel.addEventListener("pointermove",e=>moveWheelDrag(e,lockWheel,vault,document.getElementById("liveNumber")));
@@ -1062,4 +1038,4 @@ if(data.security.enabled&&data.security.sequence.length>0){
 }
 </script>
 </body>
-</html>
+ </html>
